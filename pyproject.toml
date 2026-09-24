@@ -34,7 +34,7 @@ dev = ["pytest>=8", "pyinstaller>=6.10"]
 beautiful-voice = "beautiful_voice.app:main"
 
 [project.urls]
-Homepage = "https://github.com/qpsycho/beautiful-voice"
+Homepage = "https://github.com/qpsychocode/beautiful-voice"
 
 [tool.setuptools.packages.find]
 include = ["beautiful_voice*"]

@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Callable
 
 MARKER = ".installed.json"
-USER_AGENT = "BeautifulVoice/0.1 (+https://github.com/qpsycho/beautiful-voice)"
+USER_AGENT = "BeautifulVoice/0.1 (+https://github.com/qpsychocode/beautiful-voice)"
 CHUNK = 1024 * 256
 
 

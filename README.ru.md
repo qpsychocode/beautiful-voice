@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qpsycho/beautiful-voice/releases/latest/download/BeautifulVoice-windows.zip"><b>Скачать для Windows</b></a> ·
-  <a href="https://qpsycho.github.io/beautiful-voice/">Сайт</a> ·
+  <a href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-windows.zip"><b>Скачать для Windows</b></a> ·
+  <a href="https://qpsychocode.github.io/beautiful-voice/">Сайт</a> ·
   <a href="README.md">English</a>
 </p>
 
@@ -46,7 +46,7 @@
 ## Установка из исходников
 
 ```bash
-git clone https://github.com/qpsycho/beautiful-voice
+git clone https://github.com/qpsychocode/beautiful-voice
 cd beautiful-voice
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt

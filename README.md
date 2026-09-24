@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qpsycho/beautiful-voice/releases/latest/download/BeautifulVoice-windows.zip"><b>Download for Windows</b></a> ·
-  <a href="https://qpsycho.github.io/beautiful-voice/">Website</a> ·
+  <a href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-windows.zip"><b>Download for Windows</b></a> ·
+  <a href="https://qpsychocode.github.io/beautiful-voice/">Website</a> ·
   <a href="README.ru.md">Читать по-русски</a>
 </p>
 
@@ -62,12 +62,12 @@ Accuracy is shown as `100 − WER`. Speed is how many times faster than real tim
 
 ### Download
 
-Get `BeautifulVoice-windows.zip` from the [latest release](https://github.com/qpsycho/beautiful-voice/releases/latest), unzip it anywhere and run `BeautifulVoice.exe`. The app isn't code-signed yet, so Windows SmartScreen may ask you to confirm: *More info → Run anyway*.
+Get `BeautifulVoice-windows.zip` from the [latest release](https://github.com/qpsychocode/beautiful-voice/releases/latest), unzip it anywhere and run `BeautifulVoice.exe`. The app isn't code-signed yet, so Windows SmartScreen may ask you to confirm: *More info → Run anyway*.
 
 ### From source (Windows, Python 3.10+, tested on 3.11)
 
 ```bash
-git clone https://github.com/qpsycho/beautiful-voice
+git clone https://github.com/qpsychocode/beautiful-voice
 cd beautiful-voice
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt

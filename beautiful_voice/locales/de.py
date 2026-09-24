@@ -153,11 +153,12 @@ STRINGS = {
     "set_minimized": "Im Infobereich starten",
     "set_minimized_hint": "Das Fenster beim Start nicht öffnen.",
     "set_mirror": "Server für Modell-Downloads",
-    "set_mirror_hint": "GitHub ist unsere eigene Kopie der Modelle und funktioniert auch dort, wo Hugging Face gesperrt ist. Schlägt eine Quelle fehl, wird die andere versucht.",
+    "set_mirror_hint": "„Schnellste“ testet beide Quellen einige Sekunden lang und lädt von der schnelleren. GitHub ist unsere eigene Kopie der Modelle und funktioniert auch dort, wo Hugging Face gesperrt ist.",
     "about_hint": "Open Source. Die Spracherkennung erfolgt lokal.",
     "open_data": "Datenordner öffnen",
     # tray
     "tray_open": "Beautiful Voice öffnen", "tray_start": "Diktat starten", "tray_stop": "Stoppen und einfügen",
     "tray_quit": "Beenden",
     "tray_background": "Beautiful Voice läuft im Infobereich weiter. Drücken Sie {hotkey}, um zu diktieren.",
+    "source_auto": "Schnellste",
 }

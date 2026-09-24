@@ -244,7 +244,8 @@ Flickable {
                 hint: page.t.set_mirror_hint
                 last: true
                 Segmented {
-                    options: [{ value: "mirror", label: "GitHub" }, { value: "huggingface", label: "Hugging Face" }]
+                    options: [{ value: "auto", label: page.t.source_auto }, { value: "mirror", label: "GitHub" },
+                              { value: "huggingface", label: "Hugging Face" }]
                     current: page.s.model_source
                     onPicked: v => backend.setSetting("model_source", v)
                 }

@@ -13,7 +13,7 @@ from pathlib import Path
 
 APP_NAME = "BeautifulVoice"
 APP_TITLE = "Beautiful Voice"
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.1.1"
 REPO_URL = "https://github.com/qpsychocode/beautiful-voice"
 
 

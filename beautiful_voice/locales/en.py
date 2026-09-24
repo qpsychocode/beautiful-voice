@@ -153,11 +153,12 @@ STRINGS = {
     "set_minimized": "Start in the tray",
     "set_minimized_hint": "Don't open the window at startup.",
     "set_mirror": "Model download server",
-    "set_mirror_hint": "GitHub is our own copy of the models and works where Hugging Face is blocked. If one source fails, the other is tried.",
+    "set_mirror_hint": "“Fastest” checks both sources for a few seconds and downloads from the quicker one. GitHub is our own copy of the models and works where Hugging Face is blocked.",
     "about_hint": "Open source. Speech recognition happens locally.",
     "open_data": "Open data folder",
     # tray
     "tray_open": "Open Beautiful Voice", "tray_start": "Start dictation", "tray_stop": "Stop and insert",
     "tray_quit": "Quit",
     "tray_background": "Beautiful Voice keeps running in the tray. Press {hotkey} to dictate.",
+    "source_auto": "Fastest",
 }

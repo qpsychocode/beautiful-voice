@@ -153,11 +153,12 @@ STRINGS = {
     "set_minimized": "启动到托盘",
     "set_minimized_hint": "启动时不打开主窗口。",
     "set_mirror": "模型下载服务器",
-    "set_mirror_hint": "GitHub 是我们自己的模型副本，在无法访问 Hugging Face 的地方也能使用。一个来源失败时会自动尝试另一个。",
+    "set_mirror_hint": "“最快”会先花几秒钟测试两个来源，再从更快的那个下载。GitHub 是我们自己的模型副本，在无法访问 Hugging Face 的地方也能使用。",
     "about_hint": "开源软件。语音识别完全在本地进行。",
     "open_data": "打开数据文件夹",
     # tray
     "tray_open": "打开 Beautiful Voice", "tray_start": "开始听写", "tray_stop": "停止并插入",
     "tray_quit": "退出",
     "tray_background": "Beautiful Voice 仍在托盘中运行。按 {hotkey} 即可听写。",
+    "source_auto": "最快",
 }

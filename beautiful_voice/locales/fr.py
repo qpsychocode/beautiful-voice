@@ -153,11 +153,12 @@ STRINGS = {
     "set_minimized": "Démarrer dans la zone de notification",
     "set_minimized_hint": "Ne pas ouvrir la fenêtre au démarrage.",
     "set_mirror": "Serveur de téléchargement des modèles",
-    "set_mirror_hint": "GitHub est notre propre copie des modèles et fonctionne là où Hugging Face est bloqué. Si une source échoue, l'autre est essayée.",
+    "set_mirror_hint": "« Le plus rapide » teste les deux sources quelques secondes et télécharge depuis la plus rapide. GitHub est notre propre copie des modèles et fonctionne là où Hugging Face est bloqué.",
     "about_hint": "Open source. La reconnaissance vocale s'effectue localement.",
     "open_data": "Ouvrir le dossier des données",
     # tray
     "tray_open": "Ouvrir Beautiful Voice", "tray_start": "Démarrer la dictée", "tray_stop": "Arrêter et insérer",
     "tray_quit": "Quitter",
     "tray_background": "Beautiful Voice reste actif dans la zone de notification. Appuyez sur {hotkey} pour dicter.",
+    "source_auto": "Le plus rapide",
 }

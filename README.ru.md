@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-windows.zip"><b>Скачать для Windows</b></a> ·
+  <a href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-Setup.exe"><b>Скачать для Windows</b></a> ·
   <a href="https://beautiful-voice.vercel.app">Сайт</a> ·
   <a href="README.md">English</a>
 </p>
@@ -42,6 +42,12 @@
 | Parakeet TDT v2, Nemotron Speech EN, Distil-Whisper | английский | 0,6–1,5 ГБ | см. [README](README.md) |
 
 ¹ Open ASR Leaderboard · ² FLEURS, карточки моделей NVIDIA · ³ оценка GigaAM, среднее по 10 русским наборам. Наборы разные, поэтому сравнивайте осторожно — тест голоса даёт цифры на одной и той же записи.
+
+## Установка
+
+Скачайте **`BeautifulVoice-Setup.exe`** из [последнего релиза](https://github.com/qpsychocode/beautiful-voice/releases/latest) и запустите двойным щелчком: приложение установится для вашего пользователя (без прав администратора), появятся ярлыки в «Пуске» и на рабочем столе, удалить можно через «Параметры → Приложения». Портативный `BeautifulVoice-windows.zip` лежит в том же релизе.
+
+Модели скачиваются при первом использовании с нашего зеркала на GitHub или с Hugging Face — откуда быстрее, — поэтому всё работает, даже если Hugging Face недоступен.
 
 ## Установка из исходников
 

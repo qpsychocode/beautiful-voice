@@ -164,6 +164,35 @@ def fetch_from_mirror(model_id: str, target: Path, progress: Progress, cancel: t
     _write_marker(target, f"mirror:{MIRROR_TAG}", [f["path"] for f in files], transfer.total)
 
 
+def probe_speed(url: str, seconds: float = 4.0, limit: int = 8 << 20) -> float:
+    """Bytes per second for the start of ``url``; 0 if it can't be reached."""
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Range": f"bytes=0-{limit - 1}"})
+    started = time.monotonic()
+    got = 0
+    try:
+        with urllib.request.urlopen(req, timeout=seconds + 2) as resp:
+            while got < limit and time.monotonic() - started < seconds:
+                chunk = resp.read(CHUNK)
+                if not chunk:
+                    break
+                got += len(chunk)
+    except Exception:
+        return 0.0
+    return got / max(time.monotonic() - started, 1e-3)
+
+
+def mirror_sample(model_id: str) -> tuple[str, str] | None:
+    """(mirror URL, file path) of the model's largest file, for a speed probe."""
+    try:
+        entry = mirror_manifest().get("models", {}).get(model_id)
+    except MirrorUnavailable:
+        return None
+    if not entry:
+        return None
+    biggest = max(entry["files"], key=lambda f: f["size"])
+    return f"{MIRROR_BASE}/{urllib.parse.quote(biggest['parts'][0])}", biggest["path"]
+
+
 # --- Hugging Face ------------------------------------------------------------------
 
 def list_files(endpoint: str, repo: str, revision: str = "main") -> list[RemoteFile]:

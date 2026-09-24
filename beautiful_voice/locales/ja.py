@@ -153,11 +153,12 @@ STRINGS = {
     "set_minimized": "タスクトレイで起動",
     "set_minimized_hint": "起動時にウィンドウを開きません。",
     "set_mirror": "モデルのダウンロードサーバー",
-    "set_mirror_hint": "GitHub は私たちが用意したモデルのコピーで、Hugging Face にアクセスできない環境でも使えます。一方が失敗すると、もう一方を試します。",
+    "set_mirror_hint": "「最速」は数秒間両方のソースを試し、速い方からダウンロードします。GitHub は私たちが用意したモデルのコピーで、Hugging Face にアクセスできない環境でも使えます。",
     "about_hint": "オープンソース。音声認識はすべてローカルで行われます。",
     "open_data": "データフォルダーを開く",
     # tray
     "tray_open": "Beautiful Voice を開く", "tray_start": "音声入力を開始", "tray_stop": "停止して入力",
     "tray_quit": "終了",
     "tray_background": "Beautiful Voice はタスクトレイで動作を続けています。{hotkey} を押すと音声入力できます。",
+    "source_auto": "最速",
 }

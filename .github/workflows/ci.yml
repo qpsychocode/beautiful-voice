@@ -34,8 +34,17 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt pyinstaller
       - run: pyinstaller packaging/beautiful_voice.spec --noconfirm
+      - name: Build the installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
+          & $iscc "/DAppVersion=$('${{ github.ref_name }}'.TrimStart('v'))" packaging/installer.iss
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - run: Compress-Archive -Path dist/BeautifulVoice -DestinationPath BeautifulVoice-windows.zip
         shell: pwsh
       - uses: softprops/action-gh-release@v2
         with:
-          files: BeautifulVoice-windows.zip
+          files: |
+            dist/BeautifulVoice-Setup.exe
+            BeautifulVoice-windows.zip

@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import shutil
 import threading
+import urllib.parse
 from pathlib import Path
 from typing import Callable
 
 from ..paths import models_dir
 from .catalog import CATALOG, ModelSpec, by_id
-from .download import DownloadCancelled, Downloader, fetch_from_mirror, is_installed
+from .download import DownloadCancelled, Downloader, fetch_from_mirror, is_installed, mirror_sample, probe_speed
 from .engines import Engine, create_engine
 
 
@@ -56,7 +57,10 @@ class ModelManager:
         def huggingface() -> None:
             Downloader(self._endpoint()).fetch(spec.repo, spec.include, spec.exclude, target, progress, cancel)
 
-        order = [huggingface, mirror] if self._source() == "huggingface" else [mirror, huggingface]
+        source = self._source()
+        if source == "auto":
+            source = self._faster_source(spec)
+        order = [huggingface, mirror] if source == "huggingface" else [mirror, huggingface]
         try:
             order[0]()
         except DownloadCancelled:
@@ -67,6 +71,22 @@ class ModelManager:
             # Partial files from one source can't be resumed from the other.
             shutil.rmtree(target, ignore_errors=True)
             order[1]()
+
+    def _faster_source(self, spec: ModelSpec) -> str:
+        """Time a few seconds of the biggest file from both sources at once and pick the quicker."""
+        sample = mirror_sample(spec.id)
+        if sample is None:
+            return "huggingface"
+        mirror_url, path = sample
+        hf_url = f"{self._endpoint().rstrip('/')}/{spec.repo}/resolve/main/{urllib.parse.quote(path)}"
+        speeds: dict[str, float] = {}
+        probes = [threading.Thread(target=lambda k=k, u=u: speeds.__setitem__(k, probe_speed(u)), daemon=True)
+                  for k, u in (("mirror", mirror_url), ("huggingface", hf_url))]
+        for t in probes:
+            t.start()
+        for t in probes:
+            t.join(10)
+        return "huggingface" if speeds.get("huggingface", 0) > speeds.get("mirror", 0) else "mirror"
 
     def delete(self, spec: ModelSpec) -> None:
         if spec.id == self._active_id:

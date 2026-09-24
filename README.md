@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-windows.zip"><b>Download for Windows</b></a> ·
+  <a href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-Setup.exe"><b>Download for Windows</b></a> ·
   <a href="https://beautiful-voice.vercel.app">Website</a> ·
   <a href="README.ru.md">Читать по-русски</a>
 </p>
@@ -62,7 +62,11 @@ Accuracy is shown as `100 − WER`. Speed is how many times faster than real tim
 
 ### Download
 
-Get `BeautifulVoice-windows.zip` from the [latest release](https://github.com/qpsychocode/beautiful-voice/releases/latest), unzip it anywhere and run `BeautifulVoice.exe`. The app isn't code-signed yet, so Windows SmartScreen may ask you to confirm: *More info → Run anyway*.
+Download **`BeautifulVoice-Setup.exe`** from the [latest release](https://github.com/qpsychocode/beautiful-voice/releases/latest) and double-click it: it installs for your user (no administrator prompt), adds Start menu and desktop shortcuts, and can be removed from *Settings → Apps*. Prefer no installer? The same release has a portable `BeautifulVoice-windows.zip`.
+
+The app isn't code-signed yet, so Windows SmartScreen may ask you to confirm: *More info → Run anyway*.
+
+Speech models download on first use from this project's own mirror on GitHub or from Hugging Face — whichever is faster for you — so the app works even where Hugging Face is blocked.
 
 ### From source (Windows, Python 3.10+, tested on 3.11)
 
@@ -83,7 +87,7 @@ python -m venv .venv
 .venv\Scripts\pyinstaller packaging\beautiful_voice.spec --noconfirm
 ```
 
-The app ends up in `dist\BeautifulVoice\BeautifulVoice.exe`.
+The app ends up in `dist\BeautifulVoice\BeautifulVoice.exe`. With [Inno Setup 6](https://jrsoftware.org/isinfo.php) installed, `iscc /DAppVersion=0.1.1 packaging\installer.iss` turns it into `dist\BeautifulVoice-Setup.exe`.
 
 ## Using it
 

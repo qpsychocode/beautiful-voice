@@ -37,10 +37,11 @@ RESULTS = {
 def main() -> None:
     root = Path(sys.argv[1])
     dark = "--dark" in sys.argv
-    english = "--en" in sys.argv
+    lang = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--lang=")), "en" if "--en" in sys.argv else "ru")
+    english = lang != "ru"
     root.mkdir(parents=True, exist_ok=True)
     (root / "settings.json").write_text(json.dumps({
-        "active_model": "parakeet-tdt-0.6b-v3", "ui_language": "en" if english else "ru",
+        "active_model": "nemotron-3.5-asr-streaming", "ui_language": lang,
         "theme": "dark" if dark else "light", "history_limit": 10,
     }), encoding="utf-8")
 

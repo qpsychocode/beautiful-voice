@@ -8,7 +8,7 @@ import sys
 import threading
 import time
 
-from PySide6.QtCore import (QEvent, QObject, QPoint, Property, Qt, QUrl, Signal, Slot)
+from PySide6.QtCore import QDate, QEvent, QObject, QPoint, Property, Qt, QUrl, Signal, Slot
 from PySide6.QtGui import QCursor, QDesktopServices, QGuiApplication
 
 from . import autostart, inserter
@@ -18,7 +18,7 @@ from .config import SettingsStore
 from .dictation import Dictation
 from .history import History, HistoryEntry
 from .hotkeys import _NAMED_VK, HotkeyService, parse_combo
-from .i18n import I18n
+from .i18n import I18n, languages
 from .listmodel import DictListModel
 from .metrics import speed_score
 from .models.catalog import CATALOG, RECOMMENDED, ModelSpec, by_id
@@ -29,15 +29,15 @@ from .segmenter import SAMPLE_RATE
 
 MODEL_KEYS = ["id", "name", "family", "vendor", "blurb", "meta", "sizeText", "installed", "active", "recommended",
               "downloading", "progress", "progressText", "error", "accuracy", "accuracyText", "speedValue",
-              "speedText", "source", "measured", "status", "statusText", "supportsRu", "supportsEn"]
+              "speedText", "source", "measured", "status", "statusText", "supportsUi", "supportsEn"]
 HISTORY_KEYS = ["id", "text", "time", "day", "meta"]
 BENCH_KEYS = ["id", "name", "status", "statusText", "accuracy", "accuracyText", "speedValue", "speedText",
               "hypothesis", "best", "bestTone", "rtfx"]
 
-SPEECH_LANGUAGES = [("ru", "Русский"), ("en", "English"), ("uk", "Українська"), ("de", "Deutsch"),
-                    ("fr", "Français"), ("es", "Español"), ("it", "Italiano"), ("pl", "Polski"),
-                    ("pt", "Português"), ("nl", "Nederlands"), ("cs", "Čeština"), ("tr", "Türkçe"),
-                    ("ja", "日本語"), ("zh", "中文"), ("ko", "한국어")]
+SPEECH_LANGUAGES = [("en", "English"), ("zh", "中文"), ("hi", "हिन्दी"), ("es", "Español"), ("fr", "Français"),
+                    ("ar", "العربية"), ("pt", "Português"), ("ru", "Русский"), ("de", "Deutsch"),
+                    ("ja", "日本語"), ("ko", "한국어"), ("it", "Italiano"), ("tr", "Türkçe"), ("vi", "Tiếng Việt"),
+                    ("uk", "Українська"), ("pl", "Polski"), ("nl", "Nederlands"), ("cs", "Čeština")]
 
 _KEY_LABELS = {"ctrl": "Ctrl", "alt": "Alt", "shift": "Shift", "win": "Win", "space": "Space", "enter": "Enter",
                "tab": "Tab", "backspace": "Backspace", "esc": "Esc", "insert": "Ins", "delete": "Del",
@@ -46,8 +46,6 @@ _KEY_LABELS = {"ctrl": "Ctrl", "alt": "Alt", "shift": "Shift", "win": "Win", "sp
                "printscreen": "PrtSc"}
 _VK_TO_NAME = {vk: name for name, vk in _NAMED_VK.items()}
 _MODIFIER_VKS = {0x10, 0x11, 0x12, 0x5B, 0x5C, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5}
-_MONTHS_RU = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"]
-_MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 
 def ru_plural(n: int, one: str, few: str, many: str) -> str:
@@ -119,7 +117,7 @@ class Backend(QObject):
         # Benchmark state
         self._bench_state = "ready" if bench.sample_meta() else "empty"
         meta = bench.sample_meta() or {}
-        self._bench_lang = meta.get("language") or ("ru" if i18n.lang == "ru" else "en")
+        self._bench_lang = meta.get("language") or (i18n.lang if i18n.lang in PHRASES else "en")
         self._bench_phrase = int(meta.get("phrase", 0))
         self._bench_seconds = float(meta.get("seconds", 0.0))
         self._bench_level_value = 0.0
@@ -156,10 +154,9 @@ class Backend(QObject):
         return f"{mb:.0f} {'МБ' if ru else 'MB'}"
 
     def _pref_lang(self) -> str:
+        """The language whose published numbers the cards should show."""
         lang = self.store.get("language")
-        if lang in ("ru", "en"):
-            return lang
-        return "ru" if self.i18n.lang == "ru" else "en"
+        return lang if lang != "auto" else self.i18n.lang
 
     def _when(self, ts: float) -> str:
         day = dt.date.fromtimestamp(ts)
@@ -168,8 +165,7 @@ class Backend(QObject):
             return self.tr("today")
         if day == today - dt.timedelta(days=1):
             return self.tr("yesterday")
-        months = _MONTHS_RU if self.i18n.lang == "ru" else _MONTHS_EN
-        return f"{day.day} {months[day.month - 1]}"
+        return self.i18n.short_date(QDate(day.year, day.month, day.day))
 
     @staticmethod
     def _speed_text(rtfx: float) -> str:
@@ -178,7 +174,7 @@ class Backend(QObject):
     def _langs_text(self, spec: ModelSpec) -> str:
         if spec.lang_count > 1:
             n = spec.lang_count
-            if self.i18n.lang == "ru":
+            if self.i18n.lang == "ru":  # "32 языка", not "32 языков"
                 return f"{n} {ru_plural(n, 'язык', 'языка', 'языков')}"
             return self.tr("langs_many", n=n)
         return self.tr("langs_one_ru") if spec.langs == ("ru",) else self.tr("langs_one_en")
@@ -190,13 +186,13 @@ class Backend(QObject):
         result = self.bench.results.get(spec.id)
         row: dict = {
             "id": spec.id, "name": spec.name, "family": spec.family, "vendor": spec.vendor,
-            "blurb": spec.blurb_ru if self.i18n.lang == "ru" else spec.blurb_en,
+            "blurb": self.tr(f"blurb_{spec.id}"),
             "meta": f"{spec.params} · {self._size_text(spec.size_mb)} · {self._langs_text(spec)}",
             "sizeText": self._size_text(spec.size_mb),
             "installed": installed, "active": active, "recommended": spec.id == RECOMMENDED,
             "downloading": download is not None, "progress": 0.0, "progressText": "",
             "error": self._dl_errors.get(spec.id, ""),
-            "supportsRu": spec.supports("ru"), "supportsEn": spec.supports("en"),
+            "supportsUi": spec.supports(self.i18n.lang), "supportsEn": spec.supports("en"),
             "status": "", "statusText": "",
         }
         if download is not None:
@@ -244,11 +240,7 @@ class Backend(QObject):
     def _history_row(self, entry: HistoryEntry) -> dict:
         spec = by_id(entry.model)
         seconds = int(round(entry.duration))
-        words = entry.words
-        if self.i18n.lang == "ru":
-            meta = f"{words} {ru_plural(words, 'слово', 'слова', 'слов')} · {seconds // 60}:{seconds % 60:02d}"
-        else:
-            meta = f"{words} {'word' if words == 1 else 'words'} · {seconds // 60}:{seconds % 60:02d}"
+        meta = f"{self.i18n.plural(entry.words, 'words')} · {seconds // 60}:{seconds % 60:02d}"
         if spec:
             meta += f" · {spec.name}"
         return {"id": entry.id, "text": entry.text, "time": time.strftime("%H:%M", time.localtime(entry.created)),
@@ -330,22 +322,15 @@ class Backend(QObject):
             return ""
         words, count = totals.words, totals.dictations
         minutes = int(round(words / 40 - totals.seconds / 60))  # typing at ~40 wpm vs. speaking time
-        if self.i18n.lang == "ru":
-            head = (f"Вы надиктовали {words:,} {ru_plural(words, 'слово', 'слова', 'слов')} "
-                    f"за {count} {ru_plural(count, 'диктовку', 'диктовки', 'диктовок')}").replace(",", " ")
-            return head + (f" и сэкономили около {minutes} мин набора." if minutes >= 1 else ".")
-        head = f"You've dictated {words:,} {'word' if words == 1 else 'words'} in {count} " \
-               f"{'dictation' if count == 1 else 'dictations'}"
-        return head + (f" and saved about {minutes} min of typing." if minutes >= 1 else ".")
+        pieces = {"words": self.i18n.plural(words, "words"), "count": self.i18n.plural(count, "dictations")}
+        if minutes >= 1:
+            return self.tr("totals", minutes=self.i18n.number(minutes), **pieces)
+        return self.tr("totals_short", **pieces)
 
     totalsText = Property(str, _get_totals_text, notify=lastChanged)
 
     def _get_history_subtitle(self) -> str:
-        n = self.history.limit
-        if self.i18n.lang == "ru":
-            return (f"Хранится не больше {n} {ru_plural(n, 'диктовки', 'диктовок', 'диктовок')}: "
-                    f"когда лимит заполнен, самая старая удаляется. Лимит меняется в настройках.")
-        return self.tr("history_subtitle", n=n)
+        return self.tr("history_subtitle", n=self.history.limit)
 
     historySubtitle = Property(str, _get_history_subtitle, notify=lastChanged)
 
@@ -375,6 +360,29 @@ class Backend(QObject):
         ]
 
     speechLanguages = Property("QVariantList", _get_speech_languages, notify=languageChanged)
+
+    def _get_ui_languages(self) -> list:
+        return languages()
+
+    uiLanguages = Property("QVariantList", _get_ui_languages, constant=True)
+
+    def _get_bench_languages(self) -> list:
+        return [lang for lang in languages() if lang["value"] in PHRASES]
+
+    benchLanguages = Property("QVariantList", _get_bench_languages, constant=True)
+
+    def _get_ui_language_name(self) -> str:
+        return next((lang["label"] for lang in languages() if lang["value"] == self.i18n.lang), "")
+
+    uiLanguageName = Property(str, _get_ui_language_name, notify=languageChanged)
+
+    def _get_first_download(self) -> dict:
+        """The model being downloaded while none is active yet (first start)."""
+        if self.models.active_id() or not self._downloads:
+            return {}
+        return self.models_model.get(next(iter(self._downloads))) or {}
+
+    firstDownload = Property("QVariantMap", _get_first_download, notify=countsChanged)
 
     def _get_compute_hint(self) -> str:
         engine = self.models.active_engine()
@@ -518,6 +526,8 @@ class Backend(QObject):
             return
         info["done"], info["total"] = done, total
         self._refresh_model(model_id)
+        if not self.models.active_id():
+            self.countsChanged.emit()  # the home screen shows first-start download progress
 
     @Slot(str, str)
     def _on_download_done(self, model_id: str, error: str) -> None:
@@ -746,7 +756,8 @@ class Backend(QObject):
             row.update(accuracy=float(result["accuracy"]), accuracyText=f"{result['accuracy']:.1f}%",
                        speedValue=speed_score(rtfx), speedText=self._speed_text(rtfx), rtfx=rtfx,
                        hypothesis=result.get("hypothesis", ""),
-                       statusText=self.tr("bench_done_status", wer=fmt(result["wer"] * 100),
+                       statusText=self.tr("bench_done_status", metric=result.get("metric", "wer").upper(),
+                                          value=fmt(result.get(result.get("metric", "wer"), result["wer"]) * 100),
                                           seconds=fmt(result["seconds"]), audio=fmt(result["audio_seconds"]),
                                           device=device))
         return row
@@ -834,6 +845,8 @@ class Backend(QObject):
         reference = PHRASES[lang][phrase_index % len(PHRASES[lang])]
         specs = [s for s in CATALOG if self.models.installed(s) and s.supports(lang)]
         if not specs:
+            self._bench_status = self.tr("bench_no_models_for_lang")
+            self.benchChanged.emit()
             return
         self._bench_cancel.clear()
         self._bench_state = "running"

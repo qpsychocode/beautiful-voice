@@ -18,6 +18,8 @@ jobs:
       - run: pip install -r requirements.txt pytest
       - run: python -m pytest -q
 
+  # Tags like v0.2.0 build the Windows app and attach it to a GitHub release.
+  # The asset name stays fixed so the website's download button always points at the latest one.
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: test
@@ -32,8 +34,8 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt pyinstaller
       - run: pyinstaller packaging/beautiful_voice.spec --noconfirm
-      - run: Compress-Archive -Path dist/BeautifulVoice -DestinationPath BeautifulVoice-${{ github.ref_name }}-windows.zip
+      - run: Compress-Archive -Path dist/BeautifulVoice -DestinationPath BeautifulVoice-windows.zip
         shell: pwsh
       - uses: softprops/action-gh-release@v2
         with:
-          files: BeautifulVoice-${{ github.ref_name }}-windows.zip
+          files: BeautifulVoice-windows.zip

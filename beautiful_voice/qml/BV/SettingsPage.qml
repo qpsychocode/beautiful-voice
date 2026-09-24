@@ -20,7 +20,7 @@ Flickable {
             text: section.title
             color: Theme.ink
             font.family: Theme.display
-            font.italic: true
+            font.italic: Theme.italicTitles
             font.pixelSize: 22
         }
         Rectangle {
@@ -211,8 +211,9 @@ Flickable {
             SettingRow {
                 label: page.t.set_ui_language
                 last: true
-                Segmented {
-                    options: [{ value: "ru", label: "Русский" }, { value: "en", label: "English" }]
+                Dropdown {
+                    width: 220
+                    options: backend.uiLanguages
                     current: page.s.ui_language
                     onPicked: v => backend.setSetting("ui_language", v)
                 }

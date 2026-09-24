@@ -7,6 +7,9 @@ QtObject {
     id: theme
 
     property bool dark: false
+    property string uiLang: "en"
+    // Chinese, Japanese and Hindi have no italic; slanting them synthetically looks broken.
+    readonly property bool italicTitles: ["zh", "ja", "hi"].indexOf(uiLang) < 0
 
     // Brand
     readonly property color onyx: "#101019"
@@ -60,9 +63,15 @@ QtObject {
 
     // Type: an optical serif italic for titles, Segoe UI Variable for reading,
     // Bahnschrift (DIN-like) for numbers, the timer and keycaps.
-    readonly property string display: pick(["Sitka Display", "Sitka", "Iowan Old Style", "Georgia"])
-    readonly property string body: pick(["Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", "SF Pro Text", "Inter", "Arial"])
-    readonly property string bodyStrong: pick(["Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", "SF Pro Display", "Inter", "Arial"])
+    // Chinese, Japanese and Hindi get their own system face, so every glyph comes from one font.
+    readonly property string scriptFont: uiLang === "zh" ? pick(["Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", ""])
+                                       : uiLang === "ja" ? pick(["Yu Gothic UI", "Meiryo UI", "Hiragino Sans", "Noto Sans CJK JP", ""])
+                                       : uiLang === "hi" ? pick(["Nirmala UI", "Kohinoor Devanagari", "Noto Sans Devanagari", ""])
+                                       : ""
+    readonly property string brandSerif: pick(["Sitka Display", "Sitka", "Iowan Old Style", "Georgia"])
+    readonly property string display: scriptFont || pick(["Sitka Display", "Sitka", "Iowan Old Style", "Georgia"])
+    readonly property string body: scriptFont || pick(["Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", "SF Pro Text", "Inter", "Arial"])
+    readonly property string bodyStrong: scriptFont || pick(["Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", "SF Pro Display", "Inter", "Arial"])
     readonly property string numeric: pick(["Bahnschrift", "DIN Alternate", "Segoe UI Variable Display", "Arial"])
 
     readonly property int radius: 18

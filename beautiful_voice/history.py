@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import tempfile
 import threading
 import time
@@ -19,8 +20,14 @@ from pathlib import Path
 from .paths import data_dir
 
 
+# Chinese characters and Japanese kana: each counts as a word, since these
+# scripts don't separate words with spaces.
+_CJK = re.compile(r"[぀-ヿ㐀-䶿一-鿿豈-﫿]")
+
+
 def count_words(text: str) -> int:
-    return len(text.split())
+    cjk = len(_CJK.findall(text))
+    return cjk + len(_CJK.sub(" ", text).split())
 
 
 @dataclass

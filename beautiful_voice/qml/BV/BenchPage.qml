@@ -57,8 +57,9 @@ Flickable {
                     Layout.fillWidth: true
                     StepTitle { number: "1"; text: page.t.bench_step_read }
                     Item { Layout.fillWidth: true }
-                    Segmented {
-                        options: [{ value: "ru", label: "Русский" }, { value: "en", label: "English" }]
+                    Dropdown {
+                        width: 180
+                        options: backend.benchLanguages
                         current: backend.benchLanguage
                         onPicked: v => backend.benchSetLanguage(v)
                     }
@@ -229,7 +230,7 @@ Flickable {
                                 text: "«" + model.hypothesis + "»"
                                 color: Theme.muted
                                 font.family: Theme.display
-                                font.italic: true
+                                font.italic: Theme.italicTitles
                                 font.pixelSize: 14
                                 lineHeight: 1.35
                                 wrapMode: Text.WordWrap

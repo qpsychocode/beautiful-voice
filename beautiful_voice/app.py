@@ -20,7 +20,7 @@ from .config import SettingsStore
 from .dictation import Dictation
 from .history import History
 from .hotkeys import HotkeyService
-from .i18n import I18n
+from .i18n import I18n, best_match
 from .models.catalog import CATALOG, RECOMMENDED, by_id
 from .models.manager import ModelManager
 from .paths import APP_NAME, APP_TITLE, qml_dir
@@ -70,6 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     server.listen(_instance_key())
 
     store = SettingsStore()
+    store.set("ui_language", best_match(store.get("ui_language")))  # fall back to English if not translated
     i18n = I18n(store.get("ui_language"))
 
     def fallback_language() -> str:
@@ -143,6 +144,10 @@ def main(argv: list[str] | None = None) -> int:
         installed = [s for s in CATALOG if models.installed(s)]
         active = next((s for s in installed if s.id == RECOMMENDED), installed[0] if installed else None)
     backend.activateModel(active.id if active else "")
+    if active is None and not store.get("welcomed") and not args.shots:
+        # First start: fetch the default model right away. It becomes active when done.
+        store.set("welcomed", True)
+        backend.downloadModel(RECOMMENDED)
 
     if args.shots:
         from .shots import capture

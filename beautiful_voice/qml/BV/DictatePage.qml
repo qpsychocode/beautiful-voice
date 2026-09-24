@@ -88,9 +88,48 @@ Flickable {
                         font.pixelSize: 13
                     }
                 }
+                // First start: the default model is downloading.
                 ColumnLayout {
                     Layout.alignment: Qt.AlignHCenter
-                    visible: backend.activeModelId === ""
+                    visible: backend.activeModelId === "" && backend.firstDownload.id !== undefined
+                    spacing: 10
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: page.t.first_download.replace("{name}", backend.firstDownload.name || "")
+                                                   .replace("{progress}", backend.firstDownload.progressText || "")
+                        color: Theme.ink
+                        font.family: Theme.body
+                        font.pixelSize: 14
+                    }
+                    Rectangle {
+                        Layout.alignment: Qt.AlignHCenter
+                        width: 320
+                        height: 6
+                        radius: 3
+                        color: Qt.rgba(1, 1, 1, Theme.dark ? 0.12 : 0.6)
+                        Rectangle {
+                            height: parent.height
+                            radius: 3
+                            width: Math.max(height, parent.width * (backend.firstDownload.progress || 0))
+                            Behavior on width { NumberAnimation { duration: 200 } }
+                            gradient: Gradient {
+                                orientation: Gradient.Horizontal
+                                GradientStop { position: 0; color: Theme.cornflower }
+                                GradientStop { position: 1; color: Theme.blush }
+                            }
+                        }
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: page.t.first_download_hint
+                        color: Theme.muted
+                        font.family: Theme.body
+                        font.pixelSize: 13
+                    }
+                }
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    visible: backend.activeModelId === "" && backend.firstDownload.id === undefined
                     spacing: 14
                     Text {
                         Layout.alignment: Qt.AlignHCenter
@@ -234,7 +273,7 @@ Flickable {
             text: backend.totalsText
             color: Theme.muted
             font.family: Theme.display
-            font.italic: true
+            font.italic: Theme.italicTitles
             font.pixelSize: 17
             wrapMode: Text.WordWrap
         }

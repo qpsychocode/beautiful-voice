@@ -174,7 +174,7 @@ Flickable {
                     text: page.t.history_empty_title
                     color: Theme.ink
                     font.family: Theme.display
-                    font.italic: true
+                    font.italic: Theme.italicTitles
                     font.pixelSize: 24
                 }
                 Row {

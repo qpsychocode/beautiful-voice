@@ -179,5 +179,38 @@ def test_select_files_by_pattern():
     assert chosen == ["config.json", "decoder_joint-model.int8.onnx", "encoder-model.int8.onnx", "vocab.txt"]
 
 
-def test_translations_have_the_same_keys():
-    assert set(STRINGS["en"]) == set(STRINGS["ru"])
+def test_every_locale_has_the_same_keys_and_placeholders():
+    import re
+
+    from beautiful_voice.i18n import LOCALES
+
+    assert set(LOCALES) >= {"en", "ru", "zh", "es", "fr", "de", "pt", "ja", "hi"}
+    for code, table in STRINGS.items():
+        assert set(table) == set(STRINGS["en"]), code
+        for key, text in STRINGS["en"].items():
+            assert set(re.findall(r"\{\w+\}", text)) == set(re.findall(r"\{\w+\}", table[key])), (code, key)
+        assert len(LOCALES[code].PHRASES) == 3
+
+
+def test_every_catalog_model_has_a_description():
+    for spec in CATALOG:
+        assert f"blurb_{spec.id}" in STRINGS["en"]
+
+
+def test_plural_forms():
+    from beautiful_voice.i18n import I18n
+
+    ru = I18n("ru")
+    assert ru.plural(1, "words") == "1 слово"
+    assert ru.plural(3, "words") == "3 слова"
+    assert ru.plural(12, "words") == "12 слов"
+    assert I18n("en").plural(1, "dictations") == "1 dictation"
+    assert I18n("en").plural(2, "dictations") == "2 dictations"
+
+
+def test_chinese_words_are_counted_by_character():
+    from beautiful_voice.history import count_words
+
+    assert count_words("开放时间早上九点") == 8
+    assert count_words("hello world") == 2
+    assert count_words("打开 GitHub 页面") == 5

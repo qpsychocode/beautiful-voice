@@ -15,16 +15,18 @@ from .paths import data_dir
 
 
 def _system_ui_language() -> str:
-    try:
-        code = locale.getlocale()[0] or ""
-    except ValueError:
-        code = ""
-    if not code and os.name == "nt":
+    """Two-letter code of the system's display language, e.g. "ru" or "zh"."""
+    code = ""
+    if os.name == "nt":
         import ctypes
 
-        lang_id = ctypes.windll.kernel32.GetUserDefaultUILanguage()
-        code = locale.windows_locale.get(lang_id, "")
-    return "ru" if code.lower().startswith(("ru", "russian")) else "en"
+        code = locale.windows_locale.get(ctypes.windll.kernel32.GetUserDefaultUILanguage(), "")
+    if not code:
+        try:
+            code = locale.getlocale()[0] or ""
+        except ValueError:
+            code = ""
+    return code.split("_")[0].lower() or "en"
 
 
 @dataclass

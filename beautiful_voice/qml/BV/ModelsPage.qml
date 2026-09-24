@@ -12,7 +12,7 @@ Flickable {
 
     function matches(row) {
         if (filter === "installed") return row.installed
-        if (filter === "ru") return row.supportsRu
+        if (filter === "ui") return row.supportsUi
         if (filter === "en") return row.supportsEn
         return true
     }
@@ -78,12 +78,15 @@ Flickable {
         }
 
         Segmented {
-            options: [
-                { value: "all", label: page.t.filter_all },
-                { value: "installed", label: page.t.filter_installed },
-                { value: "ru", label: page.t.filter_ru },
-                { value: "en", label: page.t.filter_en }
-            ]
+            // "All", "Downloaded", the interface language, and English when that's a different one.
+            options: {
+                let o = [{ value: "all", label: page.t.filter_all },
+                         { value: "installed", label: page.t.filter_installed },
+                         { value: "ui", label: backend.uiLanguageName }]
+                if (i18n.code !== "en")
+                    o.push({ value: "en", label: "English" })
+                return o
+            }
             current: page.filter
             onPicked: v => page.filter = v
         }

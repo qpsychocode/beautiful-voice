@@ -30,6 +30,11 @@ ApplicationWindow {
         property: "dark"
         value: backend.settings.theme === "dark"
     }
+    Binding {
+        target: Theme
+        property: "uiLang"
+        value: i18n.code
+    }
 
     Connections {
         target: backend
@@ -63,7 +68,7 @@ ApplicationWindow {
                         Text {
                             text: "Beautiful"
                             color: Theme.ink
-                            font.family: Theme.display
+                            font.family: Theme.brandSerif
                             font.italic: true
                             font.pixelSize: 23
                         }

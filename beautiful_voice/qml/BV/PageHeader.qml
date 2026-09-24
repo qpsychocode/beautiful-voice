@@ -16,7 +16,7 @@ ColumnLayout {
             text: root.title
             color: Theme.ink
             font.family: Theme.display
-            font.italic: true
+            font.italic: Theme.italicTitles
             font.pixelSize: 38
             font.letterSpacing: -0.4
         }

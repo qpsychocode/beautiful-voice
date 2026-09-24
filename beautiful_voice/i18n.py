@@ -1,264 +1,31 @@
-"""Interface strings in Russian and English."""
+"""Interface languages. Each one lives in ``locales/<code>.py``; English is the reference."""
 
 from __future__ import annotations
 
-from PySide6.QtCore import Property, QObject, Signal
+from PySide6.QtCore import Property, QDate, QLocale, QObject, Signal
 
-STRINGS: dict[str, dict[str, str]] = {
-    "en": {
-        # navigation
-        "nav_dictate": "Dictation", "nav_models": "Models", "nav_bench": "Voice test",
-        "nav_history": "History", "nav_settings": "Settings",
-        # common
-        "cancel": "Cancel", "copy": "Copy", "delete": "Delete", "change": "Change", "download": "Download",
-        "copied": "Copied",
-        # dictation page
-        "dictate_title": "Dictation",
-        "dictate_subtitle": "Press the shortcut in any app, speak, press it again — the text appears where your cursor is.",
-        "hint_toggle": "start, press again to insert the text",
-        "hint_hold": "hold while you speak, release to insert",
-        "hint_escape": "Esc or ✕ throws the recording away",
-        "no_model_hint": "Download a speech model first — it runs entirely on this computer.",
-        "pick_model": "Choose a model",
-        "card_model": "MODEL", "card_last": "LAST DICTATION",
-        "model_none": "No model yet", "model_none_hint": "Download one on the Models page",
-        "change_model": "Change model",
-        "last_empty": "Nothing yet. Press the shortcut in any window and say something.",
-        "totals": "You've dictated {words} words in {count} dictations — about {minutes} min you didn't have to type.",
-        "totals_short": "You've dictated {words} words in {count} dictations.",
-        "pill_done": "Inserted",
-        # pill notices
-        "notice_no_model": "Choose a model in Beautiful Voice first",
-        "notice_mic_error": "Can't open the microphone",
-        "notice_empty": "Didn't catch any speech",
-        "notice_error": "Recognition failed: {error}",
-        "notice_loading": "The model is still loading…",
-        # models page
-        "models_title": "Models",
-        "models_subtitle": "Speech is recognized on this computer; audio never leaves it. Download one or several and switch any time.",
-        "open_folder": "Open folder",
-        "legend_accuracy": "Accuracy — how many words it gets right (100 − WER)",
-        "legend_speed": "Speed — how much faster than real time",
-        "legend_note": "Before you run the voice test, the numbers are published results from different test sets, and speed is our estimate for a typical CPU. The voice test measures both on your voice and your computer.",
-        "filter_all": "All", "filter_installed": "Downloaded", "filter_ru": "Russian", "filter_en": "English",
-        "model_in_use": "IN USE", "model_recommended": "RECOMMENDED", "model_use": "Use this model",
-        "model_delete": "Delete from disk",
-        "none_installed": "No models downloaded yet.",
-        "metric_accuracy": "Accuracy", "metric_speed": "Speed",
-        "status_ready": "Ready — listening for the shortcut",
-        "status_loading": "Loading into memory…",
-        "status_error": "Failed to load: {error}",
-        "langs_many": "{n} languages", "langs_one_ru": "Russian only", "langs_one_en": "English only",
-        "source_measured": "Measured on your voice · {when}",
-        "source_ref": "Published: {source} ({lang}); speed is an estimate",
-        "source_none": "No published results — run the voice test",
-        "speed_tier_1": "slow", "speed_tier_2": "moderate", "speed_tier_3": "fast", "speed_tier_4": "very fast",
-        "speed_tier_5": "fastest",
-        "progress": "{done} of {total} · {pct}%",
-        "download_failed": "Download failed: {error}",
-        "lang_en": "English", "lang_ru": "Russian",
-        # benchmark
-        "bench_title": "Voice test",
-        "bench_subtitle": "Read the text aloud once. The recording goes through every downloaded model, so you see which one understands your voice and your microphone best — and how fast it is on this computer.",
-        "bench_step_read": "Read this aloud", "bench_step_compare": "Compare models",
-        "bench_other_text": "Another text",
-        "bench_record": "Record", "bench_rerecord": "Record again", "bench_stop": "Stop",
-        "bench_recording_hint": "Read at your normal pace, then press Stop.",
-        "bench_sample": "Recording saved: {seconds} s",
-        "bench_no_sample": "No recording yet.",
-        "bench_run": "Run the test", "bench_cancel": "Stop test",
-        "bench_need_models": "Download at least one model to compare.",
-        "bench_empty": "Record the text, then run the test — results for every downloaded model will appear here.",
-        "bench_waiting": "Waiting", "bench_running": "Recognizing…", "bench_loading": "Loading…",
-        "bench_done_status": "WER {wer}% · {seconds} s for {audio} s of speech · {device}",
-        "bench_progress": "Testing {name} — {i} of {n}",
-        "bench_finished": "Done. Model cards now show your results.",
-        "bench_cancelled": "Test stopped.",
-        "bench_most_accurate": "MOST ACCURATE", "bench_fastest": "FASTEST", "bench_best_both": "MOST ACCURATE AND FASTEST",
-        "bench_too_short": "The recording is too short — read the whole text.",
-        # history
-        "history_title": "History",
-        "history_subtitle": "The last {n} dictations are kept; older ones are deleted automatically. Change the limit in Settings.",
-        "history_clear": "Clear history",
-        "history_clear_confirm": "Delete all dictations from history? This can't be undone.",
-        "history_empty_title": "Nothing here yet",
-        "history_empty_hint": "Your dictations will appear here. Try",
-        "today": "today", "yesterday": "yesterday",
-        "entry_meta": "{words} words · {duration} · {model}",
-        # settings
-        "settings_title": "Settings",
-        "sec_hotkey": "Shortcut", "sec_recognition": "Recording and recognition", "sec_insert": "Inserting text",
-        "sec_history": "History", "sec_look": "Appearance", "sec_system": "System", "sec_about": "About",
-        "set_hotkey": "Dictation shortcut",
-        "set_hotkey_hint": "Works in any app, even when this window is closed.",
-        "set_hotkey_capture": "Press the new combination. Esc cancels.",
-        "set_hotkey_waiting": "Press keys…",
-        "hotkey_busy": "Another app already uses this combination. Try a different one.",
-        "hotkey_invalid": "Use at least one of Ctrl, Alt, Shift or Win plus a key.",
-        "set_mode": "How the shortcut works",
-        "mode_toggle": "Press twice", "mode_hold": "Hold to talk",
-        "set_mode_toggle_hint": "Press to start recording, press again to insert the text.",
-        "set_mode_hold_hint": "Recording lasts while you hold the keys; releasing inserts the text.",
-        "set_mic": "Microphone",
-        "mic_default": "System default",
-        "set_language": "Speech language",
-        "set_language_hint": "Auto works for most models. GigaAM is Russian only; Canary needs the language set.",
-        "lang_auto": "Detect automatically",
-        "set_live": "Recognize while I speak",
-        "set_live_hint": "Finished phrases are recognized during recording, so the text is ready almost as soon as you stop.",
-        "set_device": "Compute on",
-        "device_auto": "GPU if available", "device_cpu": "CPU only",
-        "compute_hint": "The current model runs on: {device}.",
-        "compute_hint_none": "Uses the graphics card when the drivers allow it, otherwise the processor.",
-        "set_sounds": "Sounds when recording starts and stops",
-        "set_insert": "Insert text by",
-        "insert_paste": "Pasting", "insert_type": "Typing",
-        "insert_paste_hint": "Fast and reliable: the text goes through the clipboard and Ctrl+V.",
-        "insert_type_hint": "Types character by character. Slower, but never touches the clipboard.",
-        "set_restore": "Restore the clipboard afterwards",
-        "set_restore_hint": "Whatever you had copied comes back after the text is pasted.",
-        "set_space": "Add a space after the text",
-        "set_space_hint": "Handy when you dictate several phrases in a row.",
-        "set_history_limit": "Keep the last",
-        "set_history_limit_hint": "Number of dictations to keep. When the limit is reached, the oldest one is deleted.",
-        "set_theme": "Theme", "theme_light": "Light", "theme_dark": "Dark",
-        "set_ui_language": "Interface language",
-        "set_autostart": "Start with Windows",
-        "set_autostart_hint": "Beautiful Voice starts quietly in the tray so the shortcut is always ready.",
-        "set_minimized": "Start in the tray",
-        "set_minimized_hint": "Don't open the window at startup.",
-        "set_mirror": "Model download server",
-        "set_mirror_hint": "Hugging Face address. Change it only if you use a mirror.",
-        "about_hint": "Open source. Speech recognition happens locally.",
-        "open_data": "Open data folder",
-        # tray
-        "tray_open": "Open Beautiful Voice", "tray_start": "Start dictation", "tray_stop": "Stop and insert",
-        "tray_quit": "Quit",
-        "tray_background": "Beautiful Voice keeps running in the tray. Press {hotkey} to dictate.",
-    },
-    "ru": {
-        "nav_dictate": "Диктовка", "nav_models": "Модели", "nav_bench": "Тест голоса",
-        "nav_history": "История", "nav_settings": "Настройки",
-        "cancel": "Отмена", "copy": "Скопировать", "delete": "Удалить", "change": "Изменить", "download": "Скачать",
-        "copied": "Скопировано",
-        "dictate_title": "Диктовка",
-        "dictate_subtitle": "Нажмите сочетание клавиш в любом приложении, говорите, нажмите ещё раз — текст появится там, где стоит курсор.",
-        "hint_toggle": "начать, ещё раз — вставить текст",
-        "hint_hold": "держите, пока говорите, отпустите — текст вставится",
-        "hint_escape": "Esc или ✕ — выбросить запись",
-        "no_model_hint": "Сначала скачайте модель распознавания — она работает целиком на этом компьютере.",
-        "pick_model": "Выбрать модель",
-        "card_model": "МОДЕЛЬ", "card_last": "ПОСЛЕДНЯЯ ДИКТОВКА",
-        "model_none": "Модель не выбрана", "model_none_hint": "Скачайте её на странице «Модели»",
-        "change_model": "Сменить модель",
-        "last_empty": "Пока пусто. Нажмите сочетание клавиш в любом окне и скажите что-нибудь.",
-        "totals": "Вы надиктовали {words} слов за {count} диктовок — примерно {minutes} мин, которые не пришлось печатать.",
-        "totals_short": "Вы надиктовали {words} слов за {count} диктовок.",
-        "pill_done": "Вставлено",
-        "notice_no_model": "Сначала выберите модель в Beautiful Voice",
-        "notice_mic_error": "Не получается открыть микрофон",
-        "notice_empty": "Речь не распознана",
-        "notice_error": "Ошибка распознавания: {error}",
-        "notice_loading": "Модель ещё загружается…",
-        "models_title": "Модели",
-        "models_subtitle": "Речь распознаётся на этом компьютере — звук никуда не отправляется. Скачайте одну или несколько и переключайтесь когда угодно.",
-        "open_folder": "Открыть папку",
-        "legend_accuracy": "Точность — сколько слов модель понимает верно (100 − WER)",
-        "legend_speed": "Скорость — во сколько раз быстрее реального времени",
-        "legend_note": "До теста голоса цифры точности — опубликованные результаты на разных наборах, а скорость — наша оценка для обычного процессора. Раздел «Тест голоса» измерит и то и другое на вашем голосе и вашем компьютере.",
-        "filter_all": "Все", "filter_installed": "Скачанные", "filter_ru": "Русский", "filter_en": "English",
-        "model_in_use": "ИСПОЛЬЗУЕТСЯ", "model_recommended": "РЕКОМЕНДУЕМ", "model_use": "Использовать",
-        "model_delete": "Удалить с диска",
-        "none_installed": "Пока ни одной скачанной модели.",
-        "metric_accuracy": "Точность", "metric_speed": "Скорость",
-        "status_ready": "Готова — ждёт сочетания клавиш",
-        "status_loading": "Загружается в память…",
-        "status_error": "Не загрузилась: {error}",
-        "langs_many": "{n} языков", "langs_one_ru": "только русский", "langs_one_en": "только английский",
-        "source_measured": "Измерено на вашем голосе · {when}",
-        "source_ref": "Опубликовано: {source} ({lang}); скорость — оценка",
-        "source_none": "Опубликованных замеров нет — проверьте в тесте голоса",
-        "speed_tier_1": "медленно", "speed_tier_2": "средне", "speed_tier_3": "быстро", "speed_tier_4": "очень быстро",
-        "speed_tier_5": "мгновенно",
-        "progress": "{done} из {total} · {pct}%",
-        "download_failed": "Не скачалась: {error}",
-        "lang_en": "англ.", "lang_ru": "рус.",
-        "bench_title": "Тест голоса",
-        "bench_subtitle": "Прочитайте текст вслух один раз. Запись пройдёт через все скачанные модели — вы увидите, какая лучше понимает ваш голос и ваш микрофон и насколько быстро работает на этом компьютере.",
-        "bench_step_read": "Прочитайте вслух", "bench_step_compare": "Сравните модели",
-        "bench_other_text": "Другой текст",
-        "bench_record": "Записать", "bench_rerecord": "Перезаписать", "bench_stop": "Остановить",
-        "bench_recording_hint": "Читайте в обычном темпе, потом нажмите «Остановить».",
-        "bench_sample": "Запись сохранена: {seconds} с",
-        "bench_no_sample": "Записи пока нет.",
-        "bench_run": "Запустить тест", "bench_cancel": "Остановить тест",
-        "bench_need_models": "Скачайте хотя бы одну модель, чтобы сравнивать.",
-        "bench_empty": "Запишите текст и запустите тест — здесь появятся результаты всех скачанных моделей.",
-        "bench_waiting": "В очереди", "bench_running": "Распознаёт…", "bench_loading": "Загружается…",
-        "bench_done_status": "WER {wer}% · {seconds} с на {audio} с речи · {device}",
-        "bench_progress": "Проверяю {name} — {i} из {n}",
-        "bench_finished": "Готово. Карточки моделей теперь показывают ваши результаты.",
-        "bench_cancelled": "Тест остановлен.",
-        "bench_most_accurate": "САМАЯ ТОЧНАЯ", "bench_fastest": "САМАЯ БЫСТРАЯ", "bench_best_both": "ТОЧНЕЕ И БЫСТРЕЕ ВСЕХ",
-        "bench_too_short": "Запись слишком короткая — прочитайте текст целиком.",
-        "history_title": "История",
-        "history_subtitle": "Хранятся последние {n} диктовок, более старые удаляются сами. Лимит меняется в настройках.",
-        "history_clear": "Очистить историю",
-        "history_clear_confirm": "Удалить все диктовки из истории? Вернуть их будет нельзя.",
-        "history_empty_title": "Здесь пока пусто",
-        "history_empty_hint": "Сюда попадёт всё, что вы надиктуете. Попробуйте",
-        "today": "сегодня", "yesterday": "вчера",
-        "entry_meta": "{words} сл. · {duration} · {model}",
-        "settings_title": "Настройки",
-        "sec_hotkey": "Сочетание клавиш", "sec_recognition": "Запись и распознавание", "sec_insert": "Вставка текста",
-        "sec_history": "История", "sec_look": "Внешний вид", "sec_system": "Система", "sec_about": "О приложении",
-        "set_hotkey": "Сочетание для диктовки",
-        "set_hotkey_hint": "Работает в любом приложении, даже когда это окно закрыто.",
-        "set_hotkey_capture": "Нажмите новое сочетание. Esc — отмена.",
-        "set_hotkey_waiting": "Нажмите клавиши…",
-        "hotkey_busy": "Это сочетание уже занято другой программой. Попробуйте другое.",
-        "hotkey_invalid": "Нужна хотя бы одна из клавиш Ctrl, Alt, Shift или Win плюс ещё одна клавиша.",
-        "set_mode": "Как работает сочетание",
-        "mode_toggle": "Нажать дважды", "mode_hold": "Удерживать",
-        "set_mode_toggle_hint": "Нажмите, чтобы начать запись, и ещё раз, чтобы вставить текст.",
-        "set_mode_hold_hint": "Запись идёт, пока клавиши зажаты; отпустите — текст вставится.",
-        "set_mic": "Микрофон",
-        "mic_default": "Системный по умолчанию",
-        "set_language": "Язык речи",
-        "set_language_hint": "«Автоматически» подходит большинству моделей. GigaAM понимает только русский, Canary нужен явный язык.",
-        "lang_auto": "Определять автоматически",
-        "set_live": "Распознавать, пока я говорю",
-        "set_live_hint": "Законченные фразы распознаются прямо во время записи, поэтому текст готов почти сразу после остановки.",
-        "set_device": "Вычисления",
-        "device_auto": "Видеокарта, если есть", "device_cpu": "Только процессор",
-        "compute_hint": "Текущая модель работает на: {device}.",
-        "compute_hint_none": "Использует видеокарту, если позволяют драйверы, иначе процессор.",
-        "set_sounds": "Звук при начале и конце записи",
-        "set_insert": "Как вставлять текст",
-        "insert_paste": "Вставкой", "insert_type": "Печатью",
-        "insert_paste_hint": "Быстро и надёжно: текст идёт через буфер обмена и Ctrl+V.",
-        "insert_type_hint": "Печатает по буквам. Медленнее, зато не трогает буфер обмена.",
-        "set_restore": "Возвращать буфер обмена",
-        "set_restore_hint": "То, что вы копировали раньше, вернётся в буфер после вставки.",
-        "set_space": "Пробел после текста",
-        "set_space_hint": "Удобно, когда диктуете несколько фраз подряд.",
-        "set_history_limit": "Хранить последние",
-        "set_history_limit_hint": "Сколько диктовок помнить. Когда лимит заполнен, самая старая удаляется.",
-        "set_theme": "Тема", "theme_light": "Светлая", "theme_dark": "Тёмная",
-        "set_ui_language": "Язык интерфейса",
-        "set_autostart": "Запускать вместе с Windows",
-        "set_autostart_hint": "Beautiful Voice тихо стартует в трее, и сочетание клавиш всегда наготове.",
-        "set_minimized": "Запускать в трее",
-        "set_minimized_hint": "Не открывать окно при запуске.",
-        "set_mirror": "Сервер для скачивания моделей",
-        "set_mirror_hint": "Адрес Hugging Face. Меняйте, только если пользуетесь зеркалом.",
-        "about_hint": "Открытый код. Распознавание речи — локально.",
-        "open_data": "Папка с данными",
-        "tray_open": "Открыть Beautiful Voice", "tray_start": "Начать диктовку", "tray_stop": "Остановить и вставить",
-        "tray_quit": "Выйти",
-        "tray_background": "Beautiful Voice работает в трее. Нажмите {hotkey}, чтобы диктовать.",
-    },
-}
+# Plain imports (not by name at runtime) so PyInstaller bundles every locale.
+from .locales import de, en, es, fr, hi, ja, pt, ru, zh
+
+# Most-spoken first; this is also the order of the language picker.
+LOCALES = {"en": en, "zh": zh, "hi": hi, "es": es, "fr": fr, "pt": pt, "ru": ru, "de": de, "ja": ja}
+_SLAVIC = {"ru", "uk", "pl", "cs"}
+
+STRINGS: dict[str, dict[str, str]] = {code: mod.STRINGS for code, mod in LOCALES.items()}
+
+
+def languages() -> list[dict]:
+    return [{"value": code, "label": mod.NAME} for code, mod in LOCALES.items()]
+
+
+def phrases(code: str) -> list[str]:
+    mod = LOCALES.get(code)
+    return list(mod.PHRASES) if mod else []
+
+
+def best_match(system_code: str) -> str:
+    code = (system_code or "").lower().replace("-", "_").split("_")[0]
+    return code if code in LOCALES else "en"
 
 
 class I18n(QObject):
@@ -266,14 +33,18 @@ class I18n(QObject):
 
     def __init__(self, lang: str = "en", parent=None) -> None:
         super().__init__(parent)
-        self._lang = lang if lang in STRINGS else "en"
+        self._lang = lang if lang in LOCALES else "en"
 
     @property
     def lang(self) -> str:
         return self._lang
 
+    @property
+    def locale(self) -> QLocale:
+        return QLocale(self._lang)
+
     def set_lang(self, lang: str) -> None:
-        lang = lang if lang in STRINGS else "en"
+        lang = lang if lang in LOCALES else "en"
         if lang != self._lang:
             self._lang = lang
             self.changed.emit()
@@ -282,9 +53,32 @@ class I18n(QObject):
         text = STRINGS[self._lang].get(key) or STRINGS["en"].get(key, key)
         return text.format(**kwargs) if kwargs else text
 
+    def number(self, value: float, decimals: int = 0) -> str:
+        if decimals == 0:
+            return self.locale.toString(int(round(value)))
+        return self.locale.toString(float(value), "f", decimals)
+
+    def plural(self, n: int, base: str) -> str:
+        """``plural(5, "words")`` -> "5 words" / "5 слов" / "5 个词"."""
+        if self._lang in _SLAVIC:
+            m = abs(n) % 100
+            form = "many" if 11 <= m <= 19 else "one" if m % 10 == 1 else "few" if 2 <= m % 10 <= 4 else "many"
+        else:
+            form = "one" if n == 1 else "many"
+        return self.tr(f"{base}_{form}", n=self.number(n))
+
+    def short_date(self, date: QDate) -> str:
+        fmt = "M月d日" if self._lang in ("zh", "ja") else "d MMM"
+        return self.locale.toString(date, fmt)
+
     def _strings(self) -> dict:
         merged = dict(STRINGS["en"])
         merged.update(STRINGS[self._lang])
         return merged
 
     t = Property("QVariantMap", _strings, notify=changed)
+
+    def _get_code(self) -> str:
+        return self._lang
+
+    code = Property(str, _get_code, notify=changed)

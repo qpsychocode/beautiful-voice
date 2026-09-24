@@ -15,28 +15,16 @@ from pathlib import Path
 
 import numpy as np
 
+from .i18n import LOCALES, phrases
 from .metrics import accuracy_from_wer, cer, wer
 from .paths import data_dir
 from .segmenter import SAMPLE_RATE, split_offline
 
-PHRASES = {
-    "ru": [
-        "Привет! Завтра утром у нас созвон с командой. Нужно обсудить новый дизайн приложения, проверить, "
-        "насколько быстро модель превращает речь в текст, и выбрать лучший вариант для первой версии.",
-        "Сегодня я наконец-то разобрал почту, ответил на вопросы клиентов и записал идеи для следующей встречи. "
-        "Осталось купить продукты, забрать посылку и позвонить маме вечером.",
-        "Голосовой ввод экономит время: вместо того чтобы печатать длинное сообщение, достаточно нажать сочетание "
-        "клавиш, спокойно проговорить мысль и вставить готовый текст в любое поле.",
-    ],
-    "en": [
-        "Hi there! Tomorrow morning we have a call with the team. We need to review the new app design, check how "
-        "quickly each model turns speech into text, and pick the best option for the first release.",
-        "Today I finally cleared my inbox, answered a few customer questions, and wrote down ideas for the next "
-        "meeting. I still need to buy groceries, pick up a package, and call my mom tonight.",
-        "Voice typing saves time: instead of writing a long message, you press a shortcut, calmly say what you "
-        "mean, and paste the finished text into any field you like.",
-    ],
-}
+# Texts to read aloud come from the locale files, one set per interface language.
+PHRASES = {code: phrases(code) for code in LOCALES}
+
+# Chinese and Japanese don't separate words with spaces, so they are scored by characters.
+CHARACTER_SCORED = {"zh", "ja"}
 
 
 @dataclass
@@ -52,6 +40,7 @@ class BenchResult:
     hypothesis: str
     device: str
     created: float
+    metric: str = "wer"  # which error rate accuracy is based on
 
 
 def save_wav(path: Path, audio: np.ndarray, rate: int = SAMPLE_RATE) -> None:
@@ -92,12 +81,13 @@ def run_one(engine, audio: np.ndarray, reference: str, language: str) -> BenchRe
     elapsed = time.perf_counter() - started
     hypothesis = " ".join(p.strip() for p in parts if p.strip())
     audio_s = len(audio) / SAMPLE_RATE
-    w = wer(reference, hypothesis)
+    w, c = wer(reference, hypothesis), cer(reference, hypothesis)
+    metric = "cer" if language in CHARACTER_SCORED else "wer"
     return BenchResult(
-        model=engine.spec.id, language=language, wer=round(w, 4), cer=round(cer(reference, hypothesis), 4),
-        accuracy=round(accuracy_from_wer(w), 1), rtfx=round(audio_s / max(elapsed, 1e-3), 1),
-        seconds=round(elapsed, 3), audio_seconds=round(audio_s, 2), hypothesis=hypothesis,
-        device=engine.device, created=time.time(),
+        model=engine.spec.id, language=language, wer=round(w, 4), cer=round(c, 4),
+        accuracy=round(accuracy_from_wer(c if metric == "cer" else w), 1),
+        rtfx=round(audio_s / max(elapsed, 1e-3), 1), seconds=round(elapsed, 3), audio_seconds=round(audio_s, 2),
+        hypothesis=hypothesis, device=engine.device, created=time.time(), metric=metric,
     )
 
 

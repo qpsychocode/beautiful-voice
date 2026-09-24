@@ -93,6 +93,86 @@ ApplicationWindow {
 
                 Item { Layout.fillHeight: true }
 
+                // A new version is out: shown only then.
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: 8
+                    visible: ["available", "downloading", "ready", "error"].indexOf(updater.state) >= 0
+                    radius: 14
+                    implicitHeight: upd.implicitHeight + 28
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+                        GradientStop { position: 0; color: Theme.duskA }
+                        GradientStop { position: 1; color: Theme.duskB }
+                    }
+
+                    ColumnLayout {
+                        id: upd
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.margins: 14
+                        spacing: 10
+
+                        RowLayout {
+                            spacing: 8
+                            Icon { name: "sparkle"; size: 14; color: Theme.pinkText }
+                            Text {
+                                Layout.fillWidth: true
+                                text: window.t.update_available.replace("{version}", updater.version)
+                                color: Theme.ink
+                                font.family: Theme.body
+                                font.pixelSize: 13
+                                font.weight: Font.DemiBold
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+                        ColumnLayout {
+                            visible: updater.state === "downloading"
+                            spacing: 6
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 5
+                                radius: 3
+                                color: Qt.rgba(1, 1, 1, Theme.dark ? 0.15 : 0.7)
+                                Rectangle {
+                                    height: parent.height
+                                    radius: 3
+                                    width: Math.max(height, parent.width * updater.progress)
+                                    color: Theme.primary
+                                }
+                            }
+                            Text {
+                                text: window.t.update_downloading.replace("{pct}", Math.round(updater.progress * 100))
+                                color: Theme.muted
+                                font.family: Theme.body
+                                font.pixelSize: 12
+                            }
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            visible: updater.state === "error"
+                            text: window.t.update_failed.replace("{error}", updater.error)
+                            color: Theme.danger
+                            font.family: Theme.body
+                            font.pixelSize: 12
+                            wrapMode: Text.WordWrap
+                            maximumLineCount: 3
+                            elide: Text.ElideRight
+                        }
+                        ActionButton {
+                            Layout.fillWidth: true
+                            visible: updater.state !== "downloading"
+                            compact: true
+                            icon: updater.state === "ready" ? "refresh" : "download"
+                            text: updater.state === "ready" ? window.t.update_install
+                                : updater.state === "error" ? window.t.update_retry
+                                : window.t.update_download
+                            onClicked: updater.state === "ready" ? updater.install() : updater.download()
+                        }
+                    }
+                }
+
                 // Status: which model is listening and how to call it.
                 Rectangle {
                     Layout.fillWidth: true

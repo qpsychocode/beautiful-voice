@@ -25,6 +25,7 @@ from .models.catalog import CATALOG, RECOMMENDED, by_id
 from .models.manager import ModelManager
 from .paths import APP_NAME, APP_TITLE, qml_dir
 from .tray import Tray, app_icon
+from .updates import Updater
 
 TITLE_COLORS = {"light": ("#F3F4FB", "#1E1F35"), "dark": ("#11121E", "#EEEDF8")}
 
@@ -98,6 +99,8 @@ def main(argv: list[str] | None = None) -> int:
     ctx.setContextProperty("modelsModel", backend.models_model)
     ctx.setContextProperty("historyModel", backend.history_model)
     ctx.setContextProperty("benchModel", backend.bench_model)
+    updater = Updater()
+    ctx.setContextProperty("updater", updater)
     engine.load(QUrl.fromLocalFile(str(qml_dir() / "Main.qml")))
     engine.load(QUrl.fromLocalFile(str(qml_dir() / "Overlay.qml")))
     roots = engine.rootObjects()
@@ -129,9 +132,14 @@ def main(argv: list[str] | None = None) -> int:
         app.quit()
 
     backend.quitRequested.connect(quit_app)
+    updater.quitRequested.connect(quit_app)  # the installer takes over from here
+    if args.shots:
+        updater.check()  # so screenshots show the update card when one exists
+    else:
+        updater.start()
 
     # Keep the autostart entry pointing at this copy of the app.
-    if store.get("autostart") and sys.platform == "win32":
+    if store.get("autostart") and autostart.supported():
         autostart.set_enabled(True)
 
     # The overlay must never take focus from the app you're typing in.

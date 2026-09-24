@@ -208,6 +208,16 @@ def test_plural_forms():
     assert I18n("en").plural(2, "dictations") == "2 dictations"
 
 
+def test_update_versions_compare_numerically():
+    from beautiful_voice.updates import is_newer, parse_version
+
+    assert parse_version("v0.10.2") == (0, 10, 2)
+    assert is_newer("0.1.10", "0.1.9")
+    assert is_newer("v1.0.0", "0.9.9")
+    assert not is_newer("0.1.1", "0.1.1")
+    assert not is_newer("0.1.0", "0.1.1")
+
+
 def test_chinese_words_are_counted_by_character():
     from beautiful_voice.history import count_words
 

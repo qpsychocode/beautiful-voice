@@ -162,10 +162,29 @@ def _restore_clipboard(items: list[tuple[int, bytes]]) -> None:
 def copy_to_clipboard(text: str) -> None:
     if sys.platform == "win32":
         _set_clipboard_text(text, transient=False)
+    elif sys.platform == "darwin":
+        _mac_set_clipboard(text)
     else:
         from PySide6.QtGui import QGuiApplication
 
         QGuiApplication.clipboard().setText(text)
+
+
+# --- macOS clipboard: pbcopy/pbpaste are safe to call from any thread ----------
+
+def _mac_get_clipboard() -> str | None:
+    import subprocess
+
+    try:
+        return subprocess.run(["pbpaste"], capture_output=True, timeout=2).stdout.decode("utf-8")
+    except Exception:
+        return None
+
+
+def _mac_set_clipboard(text: str) -> None:
+    import subprocess
+
+    subprocess.run(["pbcopy"], input=text.encode("utf-8"), timeout=2, check=False)
 
 
 # --- keystrokes --------------------------------------------------------------
@@ -220,7 +239,7 @@ def insert_text(text: str, target_hwnd: int = 0, method: str = "paste", restore:
     if not text:
         return
     if sys.platform != "win32":
-        _insert_generic(text, method)
+        _insert_generic(text, method, restore)
         return
     _wait_modifiers_released()
     _focus(target_hwnd)
@@ -238,15 +257,24 @@ def insert_text(text: str, target_hwnd: int = 0, method: str = "paste", restore:
         _restore_clipboard(saved)
 
 
-def _insert_generic(text: str, method: str) -> None:
+def _insert_generic(text: str, method: str, restore: bool = True) -> None:
+    """macOS (and Linux, best effort). Needs the Accessibility permission on macOS."""
     from pynput.keyboard import Controller, Key
 
     kb = Controller()
+    time.sleep(0.25)  # let go of the shortcut keys first; pynput can't ask whether they're held
     if method == "type":
         kb.type(text)
         return
-    copy_to_clipboard(text)
-    modifier = Key.cmd if sys.platform == "darwin" else Key.ctrl
-    with kb.pressed(modifier):
+    mac = sys.platform == "darwin"
+    saved = _mac_get_clipboard() if (mac and restore) else None
+    if mac:
+        _mac_set_clipboard(text)
+    else:
+        copy_to_clipboard(text)
+    with kb.pressed(Key.cmd if mac else Key.ctrl):
         kb.press("v")
         kb.release("v")
+    if saved is not None:
+        time.sleep(0.45)
+        _mac_set_clipboard(saved)

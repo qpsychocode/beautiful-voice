@@ -15,8 +15,10 @@ Rectangle {
                               : variant === "danger" ? Theme.danger
                               : Theme.ink
 
+    readonly property int padding: compact ? 26 : 34
+    readonly property int iconSpace: icon !== "" ? (compact ? 15 : 17) + 8 : 0
     implicitHeight: compact ? 32 : 38
-    implicitWidth: row.implicitWidth + (compact ? 26 : 34)
+    implicitWidth: label.implicitWidth + iconSpace + padding
     radius: height / 2
     color: {
         if (primary)
@@ -57,7 +59,11 @@ Rectangle {
             size: root.compact ? 15 : 17
         }
         Text {
+            id: label
             anchors.verticalCenter: parent.verticalCenter
+            // Elide when a layout squeezes the button below its natural width.
+            width: Math.min(implicitWidth, root.width - root.padding - root.iconSpace)
+            elide: Text.ElideRight
             text: root.text
             color: root.fg
             font.family: Theme.bodyStrong

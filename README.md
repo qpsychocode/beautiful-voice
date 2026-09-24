@@ -66,6 +66,8 @@ Download **`BeautifulVoice-Setup.exe`** from the [latest release](https://github
 
 The app isn't code-signed yet, so Windows SmartScreen may ask you to confirm: *More info → Run anyway*.
 
+**macOS** (12 or newer, Apple Silicon): download `BeautifulVoice-macOS.dmg`, open it and drag Beautiful Voice to Applications. The app isn't notarized yet, so the first time right-click it and choose *Open*. Then allow the microphone, and turn Beautiful Voice on in *System Settings → Privacy & Security → Accessibility* and *Input Monitoring* — the shortcut and pasting need both. The macOS build is new and less tested than the Windows one; reports are welcome.
+
 Speech models download on first use from this project's own mirror on GitHub or from Hugging Face — whichever is faster for you — so the app works even where Hugging Face is blocked.
 
 ### From source (Windows, Python 3.10+, tested on 3.11)
@@ -106,7 +108,9 @@ Audio from dictation is never written to disk; only the text goes into history. 
 
 ## Platforms
 
-Windows 10/11 is the primary target: the global shortcut, focus-safe overlay and clipboard handling use Win32 directly. The code runs on macOS and Linux with a `pynput` fallback for the shortcut and pasting, but those paths are less tested — contributions are welcome.
+Windows 10/11 is the primary target: the global shortcut, focus-safe overlay and clipboard handling use Win32 directly. On macOS the shortcut and ⌘V come from `pynput` and the clipboard from `pbcopy`/`pbpaste`; releases include a `.dmg` for Apple Silicon. Linux runs from source with the same `pynput` path but is untested — contributions are welcome.
+
+Installed Windows copies update themselves: when a new release is out, a card in the sidebar offers to download it, and the installer replaces the app and starts it again. Other copies get a link to the release.
 
 ## Development
 

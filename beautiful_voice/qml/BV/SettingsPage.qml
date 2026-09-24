@@ -223,8 +223,8 @@ Flickable {
         Section {
             title: page.t.sec_system
             SettingRow {
-                visible: backend.isWindows
-                label: page.t.set_autostart
+                visible: backend.canAutostart
+                label: backend.isWindows ? page.t.set_autostart : page.t.set_autostart_mac
                 hint: page.t.set_autostart_hint
                 Toggle {
                     checked: page.s.autostart
@@ -254,6 +254,23 @@ Flickable {
 
         Section {
             title: page.t.sec_about
+            SettingRow {
+                label: page.t.update_check
+                hint: updater.state === "checking" ? page.t.update_checking
+                    : updater.state === "latest" ? page.t.update_latest
+                    : ["available", "downloading", "ready"].indexOf(updater.state) >= 0
+                      ? page.t.update_available.replace("{version}", updater.version)
+                    : updater.state === "error" ? page.t.update_failed.replace("{error}", updater.error)
+                    : ""
+                ActionButton {
+                    text: page.t.update_check
+                    icon: "refresh"
+                    variant: "secondary"
+                    compact: true
+                    enabled: ["checking", "downloading"].indexOf(updater.state) < 0
+                    onClicked: updater.check()
+                }
+            }
             SettingRow {
                 label: "Beautiful Voice " + backend.version
                 hint: page.t.about_hint

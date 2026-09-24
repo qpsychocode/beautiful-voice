@@ -190,16 +190,20 @@
       <h1 data-i18n="h1">Speak. It types where you are.</h1>
       <p class="lede" data-i18n="lede">Press a shortcut in any app, say what you mean, press it again — the text lands where your cursor is. Speech is recognized on your computer, never in the cloud.</p>
       <div class="ctas">
-        <a class="btn primary" id="download" href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-Setup.exe">
+        <a class="btn primary dl-win" id="download" href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-Setup.exe">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>
           <span data-i18n="download">Download for Windows</span>
+        </a>
+        <a class="btn ghost dl-mac" href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-macOS.dmg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>
+          <span data-i18n="download_mac">Download for macOS</span>
         </a>
         <a class="btn ghost" href="https://github.com/qpsychocode/beautiful-voice">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
           <span data-i18n="github">Open source on GitHub</span>
         </a>
       </div>
-      <p class="fine" data-i18n="fine">Free and MIT-licensed · Windows 10 and 11 · the speech model (~650 MB) downloads on first start</p>
+      <p class="fine" data-i18n="fine">Free and MIT-licensed · Windows 10/11 and macOS 12+ on Apple Silicon · the speech model (~650 MB) downloads on first start</p>
 
       <div class="stage" aria-hidden="true">
         <div class="window">
@@ -286,13 +290,18 @@
     <div class="final">
       <h2 data-i18n="final">Give your hands a break.</h2>
       <div class="ctas" style="margin-top:22px">
-        <a class="btn primary" href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-Setup.exe">
+        <a class="btn primary dl-win" href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-Setup.exe">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>
           <span data-i18n="download">Download for Windows</span>
         </a>
+        <a class="btn ghost dl-mac" href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-macOS.dmg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>
+          <span data-i18n="download_mac">Download for macOS</span>
+        </a>
         <a class="btn ghost" href="https://github.com/qpsychocode/beautiful-voice/releases" data-i18n="releases">All releases</a>
       </div>
-      <p class="fine" data-i18n="unzip">Double-click BeautifulVoice-Setup.exe — it installs in a few seconds, no administrator rights needed. Windows may warn about an unsigned app: choose “More info → Run anyway”. A portable .zip is on GitHub.</p>
+      <p class="fine" data-i18n="unzip">Windows: double-click BeautifulVoice-Setup.exe — it installs in a few seconds, no administrator rights needed. If SmartScreen warns about an unsigned app, choose “More info → Run anyway”. A portable .zip is on GitHub.</p>
+      <p class="fine" data-i18n="mac_steps">macOS: open the .dmg and drag Beautiful Voice to Applications. The first time, right-click the app and choose Open, then allow the microphone, and turn Beautiful Voice on in System Settings → Privacy &amp; Security → Accessibility and Input Monitoring so the shortcut and pasting work.</p>
     </div>
   </main>
 
@@ -308,8 +317,9 @@
     nav_how: "Как это работает", nav_models: "Модели", nav_source: "Исходный код",
     h1: "Говорите. Текст появится там, где вы.",
     lede: "Нажмите сочетание клавиш в любом приложении, скажите, что хотели, нажмите ещё раз — текст окажется там, где стоит курсор. Речь распознаётся на вашем компьютере, а не в облаке.",
-    download: "Скачать для Windows", github: "Открытый код на GitHub",
-    fine: "Бесплатно, лицензия MIT · Windows 10 и 11 · модель распознавания (~650 МБ) скачается при первом запуске",
+    download: "Скачать для Windows", download_mac: "Скачать для macOS", github: "Открытый код на GitHub",
+    fine: "Бесплатно, лицензия MIT · Windows 10/11 и macOS 12+ на Apple Silicon · модель распознавания (~650 МБ) скачается при первом запуске",
+    mac_steps: "macOS: откройте .dmg и перетащите Beautiful Voice в «Программы». В первый раз щёлкните по приложению правой кнопкой → «Открыть», разрешите микрофон и включите Beautiful Voice в «Системные настройки → Конфиденциальность и безопасность → Универсальный доступ» и «Мониторинг ввода» — без этого не заработают сочетание клавиш и вставка.",
     to: "Кому: team@studio", inserted: "Вставлено", keys: "— начать, ещё раз — вставить",
     how_title: "Три клавиши, любое приложение",
     how_sub: "Чаты, почта, редактор кода, форма в браузере — если есть поле для текста, в него можно говорить.",
@@ -328,7 +338,7 @@
     f3: "Настраивается под вас", f3p: "Удержание или двойное нажатие, своё сочетание, микрофон и лимит истории. Лицензия MIT — форкайте и улучшайте.",
     langs_title: "Интерфейс на девяти языках",
     final: "Дайте рукам отдохнуть.", releases: "Все релизы",
-    unzip: "Дважды щёлкните BeautifulVoice-Setup.exe — установка займёт несколько секунд, права администратора не нужны. Windows может предупредить о неподписанном приложении — нажмите «Подробнее → Выполнить в любом случае». Портативный .zip лежит на GitHub.",
+    unzip: "Windows: дважды щёлкните BeautifulVoice-Setup.exe — установка займёт несколько секунд, права администратора не нужны. Если SmartScreen предупредит о неподписанном приложении, нажмите «Подробнее → Выполнить в любом случае». Портативный .zip лежит на GitHub.",
     issues: "Сообщить о проблеме",
   };
   const EN = {};
@@ -352,6 +362,15 @@
     restart();
   });
   applyLang();
+
+  // On a Mac, the macOS download becomes the main button.
+  if (/Mac/i.test(navigator.platform || navigator.userAgent) && !/iPhone|iPad/i.test(navigator.userAgent)) {
+    document.querySelectorAll(".dl-win").forEach(b => b.classList.replace("primary", "ghost"));
+    document.querySelectorAll(".dl-mac").forEach(b => {
+      b.classList.replace("ghost", "primary");
+      b.parentNode.insertBefore(b, b.parentNode.firstChild);
+    });
+  }
 
   // The demo: bars ripple out from the centre while "speech" plays, then the phrase is pasted.
   const barsEl = document.getElementById("bars"), pill = document.getElementById("pill");

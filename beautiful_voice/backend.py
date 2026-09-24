@@ -61,7 +61,10 @@ def key_labels(combo: str) -> list[str]:
         parsed = parse_combo(combo)
     except ValueError:
         return [combo]
-    return [_KEY_LABELS.get(k, k.upper()) for k in (*parsed.modifiers, parsed.key)]
+    labels = dict(_KEY_LABELS)
+    if sys.platform == "darwin":  # the Mac's own key symbols
+        labels.update(ctrl="⌃", alt="⌥", shift="⇧", win="⌘")
+    return [labels.get(k, k.upper()) for k in (*parsed.modifiers, parsed.key)]
 
 
 class Backend(QObject):
@@ -398,6 +401,11 @@ class Backend(QObject):
 
     isWindows = Property(bool, _get_is_windows, constant=True)
 
+    def _get_can_autostart(self) -> bool:
+        return autostart.supported()
+
+    canAutostart = Property(bool, _get_can_autostart, constant=True)
+
     def _get_version(self) -> str:
         return APP_VERSION
 
@@ -665,14 +673,18 @@ class Backend(QObject):
             return False
         vk = event.nativeVirtualKey() if sys.platform == "win32" else 0
         mods = event.modifiers()
+        # On macOS Qt reports ⌘ as Control and ⌃ as Meta; name them as the hotkey code expects.
+        ctrl_mod, cmd_mod = Qt.KeyboardModifier.ControlModifier, Qt.KeyboardModifier.MetaModifier
+        if sys.platform == "darwin":
+            ctrl_mod, cmd_mod = cmd_mod, ctrl_mod
         names = []
-        if mods & Qt.KeyboardModifier.ControlModifier:
+        if mods & ctrl_mod:
             names.append("ctrl")
         if mods & Qt.KeyboardModifier.AltModifier:
             names.append("alt")
         if mods & Qt.KeyboardModifier.ShiftModifier:
             names.append("shift")
-        if mods & Qt.KeyboardModifier.MetaModifier:
+        if mods & cmd_mod:
             names.append("win")
         if vk:
             if vk in _MODIFIER_VKS:

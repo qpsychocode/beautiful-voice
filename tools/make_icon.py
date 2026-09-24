@@ -47,3 +47,16 @@ draw_logo(256).save(str(root / "docs" / "icon.png"))
 draw_logo(256).save(str(root / "site" / "icon.png"))
 write_ico(root / "packaging" / "icon.ico")
 print("icons written:", ", ".join(map(str, SIZES)))
+
+if sys.platform == "darwin":
+    # macOS wants an .icns; iconutil builds it from a folder of named PNGs.
+    import subprocess
+    import tempfile
+
+    iconset = Path(tempfile.mkdtemp()) / "icon.iconset"
+    iconset.mkdir()
+    for size in (16, 32, 128, 256, 512):
+        draw_logo(size).save(str(iconset / f"icon_{size}x{size}.png"))
+        draw_logo(size * 2).save(str(iconset / f"icon_{size}x{size}@2x.png"))
+    subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(root / "packaging" / "icon.icns")], check=True)
+    print("icon.icns written")

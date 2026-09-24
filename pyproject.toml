@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "beautiful-voice"
+version = "0.1.0"
+description = "Local speech-to-text dictation for the desktop: press a shortcut, speak, and the text appears where your cursor is."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "qpsycho" }]
+requires-python = ">=3.10"
+keywords = ["speech-to-text", "dictation", "whisper", "parakeet", "gigaam", "nemotron", "offline", "asr"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Microsoft :: Windows",
+    "Environment :: X11 Applications :: Qt",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+dependencies = [
+    "PySide6>=6.8",
+    "numpy>=1.26",
+    "sounddevice>=0.5",
+    "faster-whisper>=1.2",
+    "onnx-asr[cpu,hub]>=0.12",
+    "sherpa-onnx>=1.13",
+    "pynput>=1.8; sys_platform != 'win32'",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pyinstaller>=6.10"]
+
+[project.scripts]
+beautiful-voice = "beautiful_voice.app:main"
+
+[project.urls]
+Homepage = "https://github.com/qpsycho/beautiful-voice"
+
+[tool.setuptools.packages.find]
+include = ["beautiful_voice*"]
+
+[tool.setuptools.package-data]
+beautiful_voice = ["qml/*.qml", "qml/BV/*.qml", "qml/BV/qmldir"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

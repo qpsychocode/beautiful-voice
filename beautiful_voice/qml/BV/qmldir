@@ -1,0 +1,25 @@
+module BV
+singleton Theme 1.0 Theme.qml
+Icon 1.0 Icon.qml
+VoiceBars 1.0 VoiceBars.qml
+VoicePill 1.0 VoicePill.qml
+Meter 1.0 Meter.qml
+ActionButton 1.0 ActionButton.qml
+IconButton 1.0 IconButton.qml
+Toggle 1.0 Toggle.qml
+Segmented 1.0 Segmented.qml
+Dropdown 1.0 Dropdown.qml
+Stepper 1.0 Stepper.qml
+Keycaps 1.0 Keycaps.qml
+Card 1.0 Card.qml
+Tag 1.0 Tag.qml
+NavItem 1.0 NavItem.qml
+PageHeader 1.0 PageHeader.qml
+SettingRow 1.0 SettingRow.qml
+ModelCard 1.0 ModelCard.qml
+LogoMark 1.0 LogoMark.qml
+DictatePage 1.0 DictatePage.qml
+ModelsPage 1.0 ModelsPage.qml
+BenchPage 1.0 BenchPage.qml
+HistoryPage 1.0 HistoryPage.qml
+SettingsPage 1.0 SettingsPage.qml

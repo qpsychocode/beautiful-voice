@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/qpsychocode/beautiful-voice/releases/latest/download/BeautifulVoice-windows.zip"><b>Download for Windows</b></a> ·
-  <a href="https://qpsychocode.github.io/beautiful-voice/">Website</a> ·
+  <a href="https://beautiful-voice.vercel.app">Website</a> ·
   <a href="README.ru.md">Читать по-русски</a>
 </p>
 

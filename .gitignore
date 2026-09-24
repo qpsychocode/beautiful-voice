@@ -10,3 +10,5 @@ dist/
 .vscode/
 *.part
 .claude/
+.vercel
+.env*

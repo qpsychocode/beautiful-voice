@@ -134,6 +134,10 @@ def main() -> None:
     for model_id in ids:
         assets = existing_assets()
         print(f"== {model_id}", flush=True)
+        entry = manifest["models"].get(model_id)
+        if entry and all(p in assets for f in entry["files"] for p in f["parts"]):
+            print("  already mirrored", flush=True)
+            continue
         mirror(model_id, manifest, assets)
         out = Path(tempfile.gettempdir()) / "manifest.json"
         out.write_text(json.dumps(manifest, indent=1), encoding="utf-8")

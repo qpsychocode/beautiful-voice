@@ -1,0 +1,30 @@
+name: Mirror models
+
+# Copies the speech models from Hugging Face into the models-v1 release, so
+# the app can download them without Hugging Face. Run it by hand after adding
+# a model to the catalog; models already on the mirror are skipped.
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: "Model ids separated by spaces (empty = the whole catalog)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BEAUTIFUL_VOICE_HOME: ${{ runner.temp }}/bv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Upload models to the mirror
+        run: python -u tools/mirror_models.py ${{ github.event.inputs.models }}

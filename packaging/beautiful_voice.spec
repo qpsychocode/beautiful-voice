@@ -22,6 +22,28 @@ a = Analysis(
     excludes=["tkinter", "matplotlib", "torch", "tensorflow"],
     noarchive=False,
 )
+# PyInstaller's PySide6 hooks pull in every Qt module. The app only needs Qt
+# Quick (Controls/Basic, Layouts, Shapes, Effects), so drop the rest: Qt
+# WebEngine alone is ~190 MB.
+UNUSED_QT = (
+    "webengine", "qt6pdf", "/qtpdf", "qt63d", "/qt3d", "quick3d", "charts", "graphs", "datavisualization",
+    "location", "positioning", "sensors", "scxml", "remoteobjects", "spatialaudio", "qt6sql", "/qtsql",
+    "sqldrivers", "qt6test", "/qttest", "texttospeech", "virtualkeyboard", "webchannel", "websockets", "webview",
+    "bluetooth", "qt6nfc", "serialport", "multimedia", "statemachine", "qt6help", "designer", "5compat",
+    "controls2imagine", "controls2material", "controls2universal", "controls2fusion", "controls2fluentwinui3",
+    "controls/imagine", "controls/material", "controls/universal", "controls/fusion", "controls/fluentwinui3",
+    "controls/ios", "controls/macos", "labsstylekit", "opengl32sw",
+)
+
+
+def _needed(entry):
+    name = entry[0].replace("\\", "/").lower()
+    return not any(part in name for part in UNUSED_QT)
+
+
+a.binaries = [b for b in a.binaries if _needed(b)]
+a.datas = [d for d in a.datas if _needed(d)]
+
 pyz = PYZ(a.pure)
 exe = EXE(
     pyz,

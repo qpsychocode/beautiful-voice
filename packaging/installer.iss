@@ -36,7 +36,9 @@ WizardImageFile=wizard-1x.bmp,wizard-2x.bmp
 WizardSmallImageFile=wizard-small-1x.bmp,wizard-small-2x.bmp
 Compression=lzma2/ultra64
 SolidCompression=yes
-LZMANumBlockThreads=4
+; The 32-bit compiler runs out of memory on ~400 MB at ultra64; a separate 64-bit process doesn't.
+LZMAUseSeparateProcess=yes
+LZMANumBlockThreads=2
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0

@@ -3,7 +3,7 @@ name: Website
 on:
   push:
     branches: [main]
-    paths: ["site/**", "docs/**", ".github/workflows/pages.yml"]
+    paths: ["site/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -23,15 +23,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Assemble the site
-        run: |
-          mkdir -p public/screenshots
-          cp site/index.html public/
-          cp docs/icon.png public/
-          cp docs/screenshots/*.png public/screenshots/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: public
+          path: site
       - id: deployment
         uses: actions/deploy-pages@v4

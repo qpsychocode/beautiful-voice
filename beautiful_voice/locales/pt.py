@@ -153,7 +153,7 @@ STRINGS = {
     "set_minimized": "Iniciar na bandeja do sistema",
     "set_minimized_hint": "Não abrir a janela ao iniciar.",
     "set_mirror": "Servidor de download dos modelos",
-    "set_mirror_hint": "Endereço do Hugging Face. Altere apenas se você usa um servidor espelho.",
+    "set_mirror_hint": "O GitHub é a nossa própria cópia dos modelos e funciona onde o Hugging Face está bloqueado. Se uma fonte falhar, a outra é tentada.",
     "about_hint": "Código aberto. O reconhecimento de voz acontece localmente.",
     "open_data": "Abrir pasta de dados",
     # tray

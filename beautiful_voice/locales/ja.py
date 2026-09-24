@@ -153,7 +153,7 @@ STRINGS = {
     "set_minimized": "タスクトレイで起動",
     "set_minimized_hint": "起動時にウィンドウを開きません。",
     "set_mirror": "モデルのダウンロードサーバー",
-    "set_mirror_hint": "Hugging Face のアドレスです。ミラーを使う場合のみ変更してください。",
+    "set_mirror_hint": "GitHub は私たちが用意したモデルのコピーで、Hugging Face にアクセスできない環境でも使えます。一方が失敗すると、もう一方を試します。",
     "about_hint": "オープンソース。音声認識はすべてローカルで行われます。",
     "open_data": "データフォルダーを開く",
     # tray

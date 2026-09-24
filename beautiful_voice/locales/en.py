@@ -153,7 +153,7 @@ STRINGS = {
     "set_minimized": "Start in the tray",
     "set_minimized_hint": "Don't open the window at startup.",
     "set_mirror": "Model download server",
-    "set_mirror_hint": "Hugging Face address. Change it only if you use a mirror.",
+    "set_mirror_hint": "GitHub is our own copy of the models and works where Hugging Face is blocked. If one source fails, the other is tried.",
     "about_hint": "Open source. Speech recognition happens locally.",
     "open_data": "Open data folder",
     # tray

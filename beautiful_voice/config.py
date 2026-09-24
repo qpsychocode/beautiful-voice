@@ -48,6 +48,7 @@ class Settings:
     start_minimized: bool = False
     compute_device: str = "auto"  # auto | cpu | cuda
     max_recording_sec: int = 600
+    model_source: str = "mirror"  # "mirror" (our GitHub release) or "huggingface"
     hf_endpoint: str = "https://huggingface.co"
     welcomed: bool = False
 

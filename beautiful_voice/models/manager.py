@@ -9,7 +9,7 @@ from typing import Callable
 
 from ..paths import models_dir
 from .catalog import CATALOG, ModelSpec, by_id
-from .download import Downloader, is_installed
+from .download import DownloadCancelled, Downloader, fetch_from_mirror, is_installed
 from .engines import Engine, create_engine
 
 
@@ -19,9 +19,11 @@ class ModelNotReady(RuntimeError):
 
 class ModelManager:
     def __init__(self, endpoint: Callable[[], str], device: Callable[[], str],
-                 language: Callable[[], str] = lambda: "en", root: Path | None = None) -> None:
+                 language: Callable[[], str] = lambda: "en", root: Path | None = None,
+                 source: Callable[[], str] = lambda: "mirror") -> None:
         self.root = root or models_dir()
         self._endpoint = endpoint
+        self._source = source
         self._device = device
         self._language = language  # used by models that cannot detect the language
         self._lock = threading.Lock()
@@ -45,7 +47,26 @@ class ModelManager:
         return is_installed(self.path(spec))
 
     def download(self, spec: ModelSpec, progress: Callable[[int, int], None], cancel: threading.Event) -> None:
-        Downloader(self._endpoint()).fetch(spec.repo, spec.include, spec.exclude, self.path(spec), progress, cancel)
+        """Try the preferred source (our GitHub mirror by default), then the other one."""
+        target = self.path(spec)
+
+        def mirror() -> None:
+            fetch_from_mirror(spec.id, target, progress, cancel)
+
+        def huggingface() -> None:
+            Downloader(self._endpoint()).fetch(spec.repo, spec.include, spec.exclude, target, progress, cancel)
+
+        order = [huggingface, mirror] if self._source() == "huggingface" else [mirror, huggingface]
+        try:
+            order[0]()
+        except DownloadCancelled:
+            raise
+        except Exception:
+            if cancel.is_set():
+                raise DownloadCancelled()
+            # Partial files from one source can't be resumed from the other.
+            shutil.rmtree(target, ignore_errors=True)
+            order[1]()
 
     def delete(self, spec: ModelSpec) -> None:
         if spec.id == self._active_id:

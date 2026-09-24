@@ -243,27 +243,10 @@ Flickable {
                 label: page.t.set_mirror
                 hint: page.t.set_mirror_hint
                 last: true
-                Rectangle {
-                    width: 280
-                    height: 36
-                    radius: Theme.radiusSmall
-                    color: Theme.surface
-                    border.width: 1
-                    border.color: endpoint.activeFocus ? Theme.cornflower : Theme.lineStrong
-                    TextInput {
-                        id: endpoint
-                        anchors.fill: parent
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
-                        verticalAlignment: TextInput.AlignVCenter
-                        text: page.s.hf_endpoint
-                        color: Theme.ink
-                        font.family: Theme.body
-                        font.pixelSize: 13
-                        clip: true
-                        selectByMouse: true
-                        onEditingFinished: backend.setSetting("hf_endpoint", text.trim() || "https://huggingface.co")
-                    }
+                Segmented {
+                    options: [{ value: "mirror", label: "GitHub" }, { value: "huggingface", label: "Hugging Face" }]
+                    current: page.s.model_source
+                    onPicked: v => backend.setSetting("model_source", v)
                 }
             }
         }

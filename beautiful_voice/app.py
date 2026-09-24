@@ -79,7 +79,7 @@ def main(argv: list[str] | None = None) -> int:
 
     history = History(store.get("history_limit"))
     models = ModelManager(endpoint=lambda: store.get("hf_endpoint"), device=lambda: store.get("compute_device"),
-                          language=fallback_language)
+                          language=fallback_language, source=lambda: store.get("model_source"))
     dictation = Dictation(store, models, history)
     backend = Backend(store, i18n, history, models, dictation, BenchStore())
 

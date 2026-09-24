@@ -153,7 +153,7 @@ STRINGS = {
     "set_minimized": "Démarrer dans la zone de notification",
     "set_minimized_hint": "Ne pas ouvrir la fenêtre au démarrage.",
     "set_mirror": "Serveur de téléchargement des modèles",
-    "set_mirror_hint": "Adresse de Hugging Face. Ne la modifiez que si vous utilisez un miroir.",
+    "set_mirror_hint": "GitHub est notre propre copie des modèles et fonctionne là où Hugging Face est bloqué. Si une source échoue, l'autre est essayée.",
     "about_hint": "Open source. La reconnaissance vocale s'effectue localement.",
     "open_data": "Ouvrir le dossier des données",
     # tray

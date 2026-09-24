@@ -153,7 +153,7 @@ STRINGS = {
     "set_minimized": "Im Infobereich starten",
     "set_minimized_hint": "Das Fenster beim Start nicht öffnen.",
     "set_mirror": "Server für Modell-Downloads",
-    "set_mirror_hint": "Adresse von Hugging Face. Nur ändern, wenn Sie einen Spiegelserver nutzen.",
+    "set_mirror_hint": "GitHub ist unsere eigene Kopie der Modelle und funktioniert auch dort, wo Hugging Face gesperrt ist. Schlägt eine Quelle fehl, wird die andere versucht.",
     "about_hint": "Open Source. Die Spracherkennung erfolgt lokal.",
     "open_data": "Datenordner öffnen",
     # tray

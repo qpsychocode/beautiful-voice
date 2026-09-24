@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+- **Recognition while you speak.** Nemotron now gets your voice as one continuous stream instead of phrase by phrase. It keeps the context of the whole utterance, so it recognizes noticeably better (on par with Handy on the same recordings), and the text is ready about a quarter of a second after you stop, however long you talked.
+- **Live text** above the recording pill shows what's been understood so far (*Settings → Show text while I speak*).
+- **Much faster on Intel 12th-gen and newer CPUs.** Models use at most four threads: with eight, work spilled onto efficiency cores and Nemotron ran 18x slower.
+- **Nemotron 3.5 ASR · Max**: the same model without 8-bit compression, the most accurate option (2.6 GB).
+- `app.log` in the data folder records what the app did (never what you said).
+
 ## 0.2.0
 - **macOS build** for Apple Silicon (`BeautifulVoice-macOS.dmg`): the shortcut and ⌘V through pynput, clipboard restore, open at login, Mac key symbols.
 - **In-app updates.** The app checks for a new release at start and every six hours. A card in the sidebar offers to download it; installed Windows copies install it and restart by themselves.

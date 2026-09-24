@@ -130,7 +130,7 @@ STRINGS = {
     "set_language_hint": "大多数模型可以使用自动检测。GigaAM 仅支持俄语；Canary 需要指定语言。",
     "lang_auto": "自动检测",
     "set_live": "边说边识别",
-    "set_live_hint": "录音过程中就会识别已说完的句子，停止录音后文字几乎立刻就绪。",
+    "set_live_hint": "Nemotron 会边听边识别，停止后约半秒文字就绪。其他模型在录音时识别已说完的句子。",
     "set_device": "计算设备",
     "device_auto": "优先使用 GPU", "device_cpu": "仅 CPU",
     "compute_hint": "当前模型运行在：{device}。",
@@ -172,4 +172,7 @@ STRINGS = {
     "update_checking": "正在检查…",
     "update_latest": "已是最新版本。",
     "set_autostart_mac": "登录时启动",
+    "blurb_nemotron-3.5-asr-streaming-full": "未经 8 位压缩的 Nemotron 3.5：真实听写中最准确，但下载更大、速度稍慢。",
+    "set_caption": "说话时显示文字",
+    "set_caption_hint": "识别出的文字会在你说话时显示在录音条上方。适用于 Nemotron 模型。",
 }

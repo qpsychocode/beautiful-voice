@@ -134,6 +134,14 @@ Flickable {
                 }
             }
             SettingRow {
+                label: page.t.set_caption
+                hint: page.t.set_caption_hint
+                Toggle {
+                    checked: page.s.live_caption
+                    onToggled: v => backend.setSetting("live_caption", v)
+                }
+            }
+            SettingRow {
                 label: page.t.set_device
                 hint: backend.computeHint
                 Segmented {

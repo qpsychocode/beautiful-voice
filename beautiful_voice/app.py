@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import logging
 import sys
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from PySide6.QtCore import QTimer, QUrl
@@ -23,7 +25,7 @@ from .hotkeys import HotkeyService
 from .i18n import I18n, best_match
 from .models.catalog import CATALOG, RECOMMENDED, by_id
 from .models.manager import ModelManager
-from .paths import APP_NAME, APP_TITLE, qml_dir
+from .paths import APP_NAME, APP_TITLE, APP_VERSION, data_dir, qml_dir
 from .tray import Tray, app_icon
 from .updates import Updater
 
@@ -44,6 +46,19 @@ def _ping_running_instance() -> bool:
     socket.waitForBytesWritten(300)
     socket.disconnectFromServer()
     return True
+
+
+log = logging.getLogger("beautiful_voice")
+
+
+def _setup_logging() -> None:
+    """app.log in the data folder: what happened, never what was said."""
+    handler = RotatingFileHandler(data_dir() / "app.log", maxBytes=1_000_000, backupCount=2, encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    root.addHandler(handler)
+    sys.excepthook = lambda t, v, tb: log.critical("unhandled error", exc_info=(t, v, tb))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -70,6 +85,8 @@ def main(argv: list[str] | None = None) -> int:
     QLocalServer.removeServer(_instance_key())
     server.listen(_instance_key())
 
+    _setup_logging()
+    log.info("start %s on %s, frozen=%s", APP_VERSION, sys.platform, getattr(sys, "frozen", False))
     store = SettingsStore()
     store.set("ui_language", best_match(store.get("ui_language")))  # fall back to English if not translated
     i18n = I18n(store.get("ui_language"))
@@ -147,12 +164,16 @@ def main(argv: list[str] | None = None) -> int:
     winstyle.make_no_activate(overlay)
 
     active = by_id(store.get("active_model"))
+    installed = [s.id for s in CATALOG if models.installed(s)]
+    log.info("models folder %s, installed: %s, saved choice: %s", models.root, installed or "none",
+             store.get("active_model") or "none")
     if active is None or not models.installed(active):
         # First run, or the model was deleted: take the recommended one if it's on disk, else any.
-        installed = [s for s in CATALOG if models.installed(s)]
-        active = next((s for s in installed if s.id == RECOMMENDED), installed[0] if installed else None)
+        pick = RECOMMENDED if RECOMMENDED in installed else (installed[0] if installed else "")
+        active = by_id(pick) if pick else None
     backend.activateModel(active.id if active else "")
     if active is None and not store.get("welcomed") and not args.shots:
+        log.info("first start without a model: downloading %s", RECOMMENDED)
         # First start: fetch the default model right away. It becomes active when done.
         store.set("welcomed", True)
         backend.downloadModel(RECOMMENDED)

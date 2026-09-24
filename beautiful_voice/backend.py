@@ -132,6 +132,8 @@ class Backend(QObject):
         dictation.level.connect(self._on_level)
         dictation.notice.connect(self._on_notice)
         dictation.completed.connect(self._on_completed)
+        dictation.partialText.connect(self._on_partial)
+        self._live_text = ""
         models.on_status(lambda status: self._model_status.emit(status))
         self._model_status.connect(self._on_model_status)
         self._progress.connect(self._on_progress)
@@ -460,6 +462,18 @@ class Backend(QObject):
             self._level = 0.0
             self.levelChanged.emit()
         self.stateChanged.emit()
+
+    liveTextChanged = Signal()
+
+    @Slot(str)
+    def _on_partial(self, text: str) -> None:
+        self._live_text = text
+        self.liveTextChanged.emit()
+
+    def _get_live_text(self) -> str:
+        return self._live_text
+
+    liveText = Property(str, _get_live_text, notify=liveTextChanged)
 
     @Slot(float)
     def _on_level(self, level: float) -> None:

@@ -30,14 +30,15 @@ def capture(app, window, overlay, backend, out_dir: Path) -> None:
         backend._on_level(max(0.0, 0.55 + 0.35 * math.sin(t) * math.sin(t * 0.37 + 1)))
 
     wobble.timeout.connect(feed_level)
+    sample = backend.tr("dictate_subtitle")
     steps.append((100, lambda: (backend.navigateRequested.emit("dictate"), wobble.start(),
-                                backend._on_state("recording"))))
+                                backend._on_state("recording"), backend._on_partial(sample))))
     steps.append((900, lambda: (shot(f"{theme}-overlay-recording", overlay), shot(f"{theme}-dictate-recording", window))))
     steps.append((100, lambda: (wobble.stop(), backend._on_state("processing"))))
     steps.append((500, lambda: shot(f"{theme}-overlay-processing", overlay)))
     steps.append((100, lambda: backend._on_state("done")))
     steps.append((500, lambda: shot(f"{theme}-overlay-done", overlay)))
-    steps.append((100, lambda: backend._on_state("idle")))
+    steps.append((100, lambda: (backend._on_state("idle"), backend._on_partial(""))))
     steps.append((400, app.quit))
 
     def run(i: int = 0) -> None:

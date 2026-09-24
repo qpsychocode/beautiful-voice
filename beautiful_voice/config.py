@@ -40,6 +40,7 @@ class Settings:
     restore_clipboard: bool = True
     trailing_space: bool = True
     live_transcription: bool = True
+    live_caption: bool = True  # show the recognized text above the pill while recording
     history_limit: int = 10
     sounds: bool = True
     ui_language: str = ""

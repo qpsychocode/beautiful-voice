@@ -55,6 +55,7 @@ class ModelSpec:
     onnx_name: str = ""
     quantization: str | None = None
     multilingual_stream: bool = False
+    file_suffix: str = ".int8"  # sherpa-onnx builds: "encoder.int8.onnx" vs full-precision "encoder.onnx"
 
     def supports(self, lang: str) -> bool:
         return "*" in self.langs or lang in self.langs
@@ -76,6 +77,21 @@ CATALOG: tuple[ModelSpec, ...] = (
         backend="sherpa-onnx", repo="csukuangfj2/sherpa-onnx-nemotron-3.5-asr-streaming-0.6b-1120ms-int8-2026-06-11",
         include=("encoder.int8.onnx", "decoder.int8.onnx", "joiner.int8.onnx", "tokens.txt"),
         size_mb=651, params="0.6B", langs=_NEMOTRON, lang_count=32, speed_tier=4, multilingual_stream=True,
+        refs=(Reference("en", 8.72, LEADERBOARD), Reference("ru", 9.17, FLEURS),
+              Reference("es", 4.11, NVIDIA_CARD), Reference("it", 4.25, NVIDIA_CARD),
+              Reference("pt", 5.48, NVIDIA_CARD), Reference("hi", 6.81, NVIDIA_CARD),
+              Reference("ko", 7.12, NVIDIA_CARD), Reference("de", 8.31, NVIDIA_CARD),
+              Reference("fr", 9.03, NVIDIA_CARD), Reference("ja", 11.48, NVIDIA_CARD),
+              Reference("ar", 12.03, NVIDIA_CARD), Reference("zh", 19.28, NVIDIA_CARD)),
+    ),
+    ModelSpec(
+        # The same model without 8-bit compression: measurably more accurate on real
+        # dictation, 3.5x the download and somewhat slower, still fast enough to stream.
+        id="nemotron-3.5-asr-streaming-full", name="Nemotron 3.5 ASR · Max", family="Nemotron", vendor="NVIDIA",
+        backend="sherpa-onnx", repo="csukuangfj2/sherpa-onnx-nemotron-3.5-asr-streaming-0.6b-1120ms-2026-06-11",
+        include=("encoder.onnx", "encoder.data", "decoder.onnx", "joiner.onnx", "tokens.txt"),
+        size_mb=2595, params="0.6B", langs=_NEMOTRON, lang_count=32, speed_tier=3, multilingual_stream=True,
+        file_suffix="",
         refs=(Reference("en", 8.72, LEADERBOARD), Reference("ru", 9.17, FLEURS),
               Reference("es", 4.11, NVIDIA_CARD), Reference("it", 4.25, NVIDIA_CARD),
               Reference("pt", 5.48, NVIDIA_CARD), Reference("hi", 6.81, NVIDIA_CARD),

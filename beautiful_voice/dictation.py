@@ -1,13 +1,15 @@
 """The dictation loop: hotkey -> record -> transcribe -> insert.
 
-While the user talks, finished phrases are sent to the model one by one, so
-by the time they press the hotkey again most of the text is already known and
-only the last phrase is left to recognize.
+Streaming models (Nemotron) get the audio every quarter second through one
+live stream, so the whole utterance keeps its context and only the last
+chunk is left to decode when the user stops. Other models get finished
+phrases, cut at pauses, one by one while the user keeps talking.
 """
 
 from __future__ import annotations
 
 import itertools
+import logging
 import os
 import re
 import threading
@@ -22,10 +24,12 @@ from . import inserter
 from .audio import Recorder, play_chime
 from .config import SettingsStore
 from .history import History, HistoryEntry
+from .models.catalog import by_id
 from .models.manager import ModelManager
 from .segmenter import SAMPLE_RATE, Segment, Segmenter, split_offline
 
 MIN_RECORDING_S = 0.4
+log = logging.getLogger(__name__)
 
 # Phrases Whisper is known to invent on silence or noise (it learned them from
 # subtitle credits). Dropped only when they make up the whole phrase.
@@ -58,6 +62,16 @@ class Session:
     cancelled: bool = False
     error: str = ""
     duration: float = 0.0
+    # Streaming models: audio goes into one live stream as it's spoken.
+    streaming: bool = False
+    live: object | None = None
+    pending: list = field(default_factory=list)
+    pending_samples: int = 0
+    partial: str = ""
+    stopped: float = 0.0
+
+
+STREAM_BATCH = 4000  # samples (0.25 s) handed to the streaming model at a time
 
 
 class Dictation(QObject):
@@ -65,6 +79,7 @@ class Dictation(QObject):
     level = Signal(float)
     notice = Signal(str)  # message key for the overlay: "no_model", "mic_error", "empty", ...
     completed = Signal(object)  # HistoryEntry
+    partialText = Signal(str)  # what's been recognized so far, while recording
     _hotkey_press = Signal()
     _hotkey_release = Signal()
     _escape = Signal()
@@ -155,6 +170,9 @@ class Dictation(QObject):
         is_self = inserter.window_process_id(target) == os.getpid()
         language = self.settings.get("language")
         self.session = Session(next(self._ids), language, target, is_self)
+        spec = by_id(self.models.active_id())
+        self.session.streaming = bool(spec and spec.backend == "sherpa-onnx" and self.settings.get("live_transcription"))
+        self.partialText.emit("")
         self.segmenter.reset()
         try:
             self.recorder.start(self.settings.get("input_device"))
@@ -173,8 +191,51 @@ class Dictation(QObject):
         session = self.session
         if session is None or not self.settings.get("live_transcription"):
             return
+        if session.streaming:
+            session.pending.append(samples)
+            session.pending_samples += len(samples)
+            if session.pending_samples >= STREAM_BATCH:
+                self._flush_pending(session)
+            return
         for segment in self.segmenter.feed(samples):
             self._submit(session, segment)
+
+    # --- streaming models ----------------------------------------------------
+
+    def _flush_pending(self, session: Session) -> None:
+        if not session.pending:
+            return
+        chunk = np.concatenate(session.pending)
+        session.pending, session.pending_samples = [], 0
+        self.worker.submit(self._feed, session, chunk)
+
+    def _feed(self, session: Session, chunk: np.ndarray) -> None:
+        # Worker thread: the model decodes while the user keeps talking.
+        if session.cancelled or session.error:
+            return
+        try:
+            if session.live is None:
+                lang = None if session.language == "auto" else session.language
+                session.live = self.models.engine(timeout=180).open_stream(lang)
+            session.live.accept(chunk)
+            text = session.live.partial()
+        except Exception as exc:
+            session.error = str(exc) or exc.__class__.__name__
+            return
+        if text != session.partial and session is self.session:
+            session.partial = text
+            self.partialText.emit(text)
+
+    def _finish_stream(self, session: Session) -> None:
+        if session.cancelled:
+            return
+        text = ""
+        if session.live is not None and not session.error:
+            try:
+                text = session.live.finish()
+            except Exception as exc:
+                session.error = str(exc) or exc.__class__.__name__
+        self._finished.emit(session, text)
 
     def _submit(self, session: Session, segment: Segment) -> None:
         if segment.has_speech:
@@ -214,6 +275,11 @@ class Dictation(QObject):
             return
         self._set_state("processing")
         self._chime("stop")
+        session.stopped = time.monotonic()
+        if session.streaming:
+            self._flush_pending(session)
+            self.worker.submit(self._finish_stream, session)
+            return
         if self.settings.get("live_transcription"):
             tail = self.segmenter.flush()
             if tail is not None:
@@ -249,6 +315,9 @@ class Dictation(QObject):
         if session is not self.session or session.cancelled:
             return
         self.session = None
+        log.info("dictation %s: %.1fs of speech, %s, ready %.2fs after stop, %d chars%s",
+                 session.id, session.duration, "streamed" if session.streaming else "by phrase",
+                 time.monotonic() - session.stopped, len(text), f", error: {session.error}" if session.error else "")
         if session.error:
             self.notice.emit("error:" + session.error)
             self._chime("error")

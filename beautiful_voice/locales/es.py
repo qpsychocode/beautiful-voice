@@ -130,7 +130,7 @@ STRINGS = {
     "set_language_hint": "La detección automática funciona con la mayoría de los modelos. GigaAM solo admite ruso; Canary necesita que se indique el idioma.",
     "lang_auto": "Detectar automáticamente",
     "set_live": "Reconocer mientras hablo",
-    "set_live_hint": "Las frases terminadas se reconocen durante la grabación, así que el texto está listo casi en cuanto paras.",
+    "set_live_hint": "Nemotron reconoce tu voz a medida que llega, así que el texto está listo medio segundo después de parar. Los demás modelos reconocen frases completas durante la grabación.",
     "set_device": "Procesar en",
     "device_auto": "GPU si está disponible", "device_cpu": "Solo CPU",
     "compute_hint": "El modelo actual se ejecuta en: {device}.",
@@ -172,4 +172,7 @@ STRINGS = {
     "update_checking": "Buscando…",
     "update_latest": "Tienes la última versión.",
     "set_autostart_mac": "Abrir al iniciar sesión",
+    "blurb_nemotron-3.5-asr-streaming-full": "El mismo Nemotron 3.5 sin compresión de 8 bits: el más preciso en dictado real, más pesado y algo más lento.",
+    "set_caption": "Mostrar el texto mientras hablo",
+    "set_caption_hint": "Las palabras reconocidas aparecen sobre la píldora de grabación mientras hablas. Funciona con los modelos Nemotron.",
 }

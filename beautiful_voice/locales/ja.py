@@ -130,7 +130,7 @@ STRINGS = {
     "set_language_hint": "ほとんどのモデルは自動検出で使えます。GigaAM はロシア語のみ、Canary は言語の指定が必要です。",
     "lang_auto": "自動検出",
     "set_live": "話しながら認識",
-    "set_live_hint": "録音中に話し終えたフレーズから順に認識するので、停止するとほぼすぐにテキストが用意できます。",
+    "set_live_hint": "Nemotron は話しながら認識するので、止めてから約 0.5 秒でテキストが準備できます。他のモデルは録音中に話し終えた文を認識します。",
     "set_device": "処理デバイス",
     "device_auto": "GPU を優先", "device_cpu": "CPU のみ",
     "compute_hint": "現在のモデルは {device} で動作しています。",
@@ -172,4 +172,7 @@ STRINGS = {
     "update_checking": "確認中…",
     "update_latest": "最新バージョンです。",
     "set_autostart_mac": "ログイン時に開く",
+    "blurb_nemotron-3.5-asr-streaming-full": "8 ビット圧縮なしの Nemotron 3.5。実際の音声入力で最も正確ですが、サイズが大きく少し遅めです。",
+    "set_caption": "話している間にテキストを表示",
+    "set_caption_hint": "認識された言葉が話している間に録音バーの上に表示されます。Nemotron モデルで使えます。",
 }

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 import shutil
 import threading
+import time
 import urllib.parse
 from pathlib import Path
 from typing import Callable
@@ -12,6 +14,9 @@ from ..paths import models_dir
 from .catalog import CATALOG, ModelSpec, by_id
 from .download import DownloadCancelled, Downloader, fetch_from_mirror, is_installed, mirror_sample, probe_speed
 from .engines import Engine, create_engine
+
+
+log = logging.getLogger(__name__)
 
 
 class ModelNotReady(RuntimeError):
@@ -61,6 +66,7 @@ class ModelManager:
         if source == "auto":
             source = self._faster_source(spec)
         order = [huggingface, mirror] if source == "huggingface" else [mirror, huggingface]
+        log.info("download %s from %s first", spec.id, order[0].__name__)
         try:
             order[0]()
         except DownloadCancelled:
@@ -68,9 +74,12 @@ class ModelManager:
         except Exception:
             if cancel.is_set():
                 raise DownloadCancelled()
+            log.warning("download %s from %s failed, trying %s", spec.id, order[0].__name__, order[1].__name__,
+                        exc_info=True)
             # Partial files from one source can't be resumed from the other.
             shutil.rmtree(target, ignore_errors=True)
             order[1]()
+        log.info("download %s finished", spec.id)
 
     def _faster_source(self, spec: ModelSpec) -> str:
         """Time a few seconds of the biggest file from both sources at once and pick the quicker."""
@@ -139,9 +148,12 @@ class ModelManager:
         self._set_status("loading")
 
         def run() -> None:
+            started = time.monotonic()
             try:
                 engine = self.load(spec)
+                log.info("loaded %s on %s in %.1fs", spec.id, engine.device, time.monotonic() - started)
             except Exception as exc:
+                log.error("loading %s failed", spec.id, exc_info=True)
                 with self._lock:
                     stale = generation != self._load_generation
                 if not stale:

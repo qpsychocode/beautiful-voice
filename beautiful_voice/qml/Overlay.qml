@@ -10,8 +10,8 @@ Window {
     objectName: "overlay"
     flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus | Qt.NoDropShadowWindowHint
     color: "transparent"
-    width: 600
-    height: 110
+    width: 640
+    height: 170
     visible: false
 
     readonly property bool wanted: backend.state !== "idle"
@@ -41,6 +41,40 @@ Window {
         id: hideTimer
         interval: 280
         onTriggered: if (!overlay.wanted) overlay.visible = false
+    }
+
+    // What the model has understood so far, newest words on the right.
+    Rectangle {
+        id: caption
+        readonly property bool shown: overlay.wanted && backend.settings.live_caption && backend.liveText !== ""
+                                      && (overlay.phase === "recording" || overlay.phase === "processing")
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: pill.top
+        anchors.bottomMargin: 10
+        width: Math.min(captionText.implicitWidth + 32, overlay.width - 40)
+        height: 38
+        radius: 14
+        color: Qt.rgba(0.063, 0.063, 0.098, 0.9)
+        border.width: 1
+        border.color: Qt.rgba(1, 1, 1, 0.08)
+        opacity: shown ? 1 : 0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 180 } }
+
+        Text {
+            id: captionText
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+            text: backend.liveText
+            color: "#F2F1FB"
+            font.family: Theme.body
+            font.pixelSize: 14
+            elide: Text.ElideLeft
+            horizontalAlignment: implicitWidth > width ? Text.AlignRight : Text.AlignHCenter
+        }
     }
 
     VoicePill {

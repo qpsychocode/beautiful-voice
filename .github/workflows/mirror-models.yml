@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 180
     env:
       GH_TOKEN: ${{ github.token }}
-      BEAUTIFUL_VOICE_HOME: ${{ runner.temp }}/bv
+      BEAUTIFUL_VOICE_HOME: /tmp/bv
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

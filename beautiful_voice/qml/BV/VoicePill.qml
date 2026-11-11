@@ -11,9 +11,11 @@ Rectangle {
     property string doneText: ""
     property bool showStart: false  // the home-screen copy offers a mic button when idle
     property bool showClose: true
+    property bool showStop: false   // a "finish and insert" button next to the close button while recording
     property real u: 1              // size multiplier
     signal closeClicked()
     signal startClicked()
+    signal stopClicked()
 
     readonly property bool busy: phase === "recording" || phase === "processing"
     property int tenths: 0
@@ -119,6 +121,34 @@ Rectangle {
             font.pixelSize: 14 * pill.u
             horizontalAlignment: Text.AlignRight
             width: 34 * pill.u
+        }
+
+        Rectangle {
+            id: stopButton
+            visible: pill.phase === "recording" && pill.showStop
+            anchors.verticalCenter: parent.verticalCenter
+            width: 28 * pill.u
+            height: width
+            radius: width / 2
+            color: stopHit.containsMouse ? Qt.lighter(Theme.blush, 1.08) : Theme.blush
+            Behavior on color { ColorAnimation { duration: 120 } }
+
+            Icon {
+                anchors.centerIn: parent
+                name: "check"
+                color: Theme.onyx
+                size: 15 * pill.u
+                stroke: 2.4
+            }
+
+            MouseArea {
+                id: stopHit
+                anchors.fill: parent
+                anchors.margins: -4
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: pill.stopClicked()
+            }
         }
 
         Rectangle {

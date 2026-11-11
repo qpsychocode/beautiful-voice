@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+- **Floating mic button** at the bottom of the screen starts dictation with a click, without touching the keyboard (*Settings → Mic button on top of other windows*). Hides automatically while a video or game is full screen.
+- **Editable live text.** While recording, the live text box above the pill now works for all models, lets you click to edit or clear recognized words on the fly before they are inserted, and includes a finish-and-insert check button right on the pill.
+- **Start with Windows / Open at login** (*Settings → System*).
+
 ## 0.3.0
 - **Recognition while you speak.** Nemotron now gets your voice as one continuous stream instead of phrase by phrase. It keeps the context of the whole utterance, so it recognizes noticeably better (on par with Handy on the same recordings), and the text is ready about a quarter of a second after you stop, however long you talked.
 - **Live text** above the recording pill shows what's been understood so far (*Settings → Show text while I speak*).

@@ -8,10 +8,10 @@ import sys
 import threading
 import time
 
-from PySide6.QtCore import QDate, QEvent, QObject, QPoint, Property, Qt, QUrl, Signal, Slot
-from PySide6.QtGui import QCursor, QDesktopServices, QGuiApplication
+from PySide6.QtCore import QDate, QEvent, QObject, QPoint, Property, Qt, QTimer, QUrl, Signal, Slot
+from PySide6.QtGui import QCursor, QDesktopServices, QGuiApplication, QRegion
 
-from . import autostart, inserter
+from . import autostart, inserter, winstyle
 from .audio import Recorder, list_input_devices
 from .benchmark import PHRASES, BenchResult, BenchStore, run_one
 from .config import SettingsStore
@@ -102,6 +102,14 @@ class Backend(QObject):
         self.bench = bench
         self.hotkeys: HotkeyService | None = None
         self.overlay = None
+        self._overlay_editing = False
+        self._overlay_mask: tuple = ()
+        self._fullscreen = False
+        # The floating button steps aside while a video or game is full screen.
+        self._fullscreen_timer = QTimer(self)
+        self._fullscreen_timer.setInterval(1000)
+        self._fullscreen_timer.timeout.connect(self._check_fullscreen)
+        self._fullscreen_timer.start()
 
         self.models_model = DictListModel(MODEL_KEYS, parent=self)
         self.history_model = DictListModel(HISTORY_KEYS, parent=self)
@@ -504,6 +512,54 @@ class Backend(QObject):
     @Slot()
     def cancelDictation(self) -> None:  # noqa: N802
         self.dictation.cancel()
+
+    @Slot(str)
+    def editLiveText(self, text: str) -> None:  # noqa: N802
+        self.dictation.edit_text(text)
+
+    @Slot(bool)
+    def setOverlayEditing(self, on: bool) -> None:  # noqa: N802
+        """Typing into the overlay needs the keyboard; give it back to the app you dictate into after."""
+        if self.overlay is None or on == self._overlay_editing:
+            return
+        self._overlay_editing = on
+        if on:
+            self.overlay.setFlags(self.overlay.flags() & ~Qt.WindowType.WindowDoesNotAcceptFocus)
+            winstyle.activate(self.overlay)
+            self.overlay.requestActivate()
+        else:
+            self.overlay.setFlags(self.overlay.flags() | Qt.WindowType.WindowDoesNotAcceptFocus)
+            winstyle.make_no_activate(self.overlay)
+
+    @Slot("QVariantList")
+    def setOverlayMask(self, rects: list) -> None:  # noqa: N802
+        """Clicks outside the visible pill, caption and button go through to the windows below."""
+        if self.overlay is None:
+            return
+        key = tuple(tuple(int(round(r[k])) for k in ("x", "y", "width", "height")) for r in rects)
+        if key == self._overlay_mask:
+            return
+        self._overlay_mask = key
+        region = QRegion()
+        for x, y, w, h in key:
+            if w > 0 and h > 0:
+                region = region.united(QRegion(x, y, w, h))
+        if region.isEmpty():
+            region = QRegion(0, 0, 1, 1)  # an empty mask means "no mask": keep one pixel instead
+        self.overlay.setMask(region)
+
+    fullscreenChanged = Signal()
+
+    def _check_fullscreen(self) -> None:
+        busy = self.store.get("floating_button") and winstyle.foreground_is_fullscreen()
+        if busy != self._fullscreen:
+            self._fullscreen = busy
+            self.fullscreenChanged.emit()
+
+    def _get_fullscreen(self) -> bool:
+        return self._fullscreen
+
+    fullscreenApp = Property(bool, _get_fullscreen, notify=fullscreenChanged)
 
     @Slot()
     def placeOverlay(self) -> None:  # noqa: N802

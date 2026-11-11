@@ -174,5 +174,8 @@ STRINGS = {
     "set_autostart_mac": "Ouvrir à l'ouverture de session",
     "blurb_nemotron-3.5-asr-streaming-full": "Le même Nemotron 3.5 sans compression 8 bits : le plus précis en dictée réelle, plus lourd et un peu plus lent.",
     "set_caption": "Afficher le texte pendant que je parle",
-    "set_caption_hint": "Les mots reconnus s'affichent au-dessus de la pastille d'enregistrement pendant que vous parlez. Fonctionne avec les modèles Nemotron.",
+    "set_caption_hint": "Les mots reconnus s'affichent au-dessus de la pastille d'enregistrement pendant que vous parlez. Cliquez sur le texte pour le corriger avant l'insertion.",
+    "set_floating": "Bouton micro au-dessus des autres fenêtres",
+    "set_floating_hint": "Un petit bouton en bas de l'écran lance la dictée d'un clic. Il se cache quand une vidéo ou un jeu est en plein écran.",
+    "overlay_placeholder": "Parlez, le texte s'affiche ici. Cliquez pour le modifier",
 }

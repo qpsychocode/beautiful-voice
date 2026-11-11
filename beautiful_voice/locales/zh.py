@@ -174,5 +174,8 @@ STRINGS = {
     "set_autostart_mac": "登录时启动",
     "blurb_nemotron-3.5-asr-streaming-full": "未经 8 位压缩的 Nemotron 3.5：真实听写中最准确，但下载更大、速度稍慢。",
     "set_caption": "说话时显示文字",
-    "set_caption_hint": "识别出的文字会在你说话时显示在录音条上方。适用于 Nemotron 模型。",
+    "set_caption_hint": "识别出的文字会在你说话时显示在录音条上方。在插入前点击文字即可修改。",
+    "set_floating": "在其他窗口上方显示麦克风按钮",
+    "set_floating_hint": "屏幕底部的小按钮,点一下即可开始听写。视频或游戏全屏时自动隐藏。",
+    "overlay_placeholder": "请说话,文字会显示在这里。点击即可编辑",
 }

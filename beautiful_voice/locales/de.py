@@ -174,5 +174,8 @@ STRINGS = {
     "set_autostart_mac": "Beim Anmelden öffnen",
     "blurb_nemotron-3.5-asr-streaming-full": "Dasselbe Nemotron 3.5 ohne 8-Bit-Komprimierung: am genauesten beim echten Diktieren, größer und etwas langsamer.",
     "set_caption": "Text beim Sprechen anzeigen",
-    "set_caption_hint": "Die erkannten Wörter erscheinen beim Sprechen über der Aufnahmeleiste. Funktioniert mit Nemotron-Modellen.",
+    "set_caption_hint": "Die erkannten Wörter erscheinen beim Sprechen über der Aufnahmeleiste. Klicken Sie auf den Text, um ihn vor dem Einfügen zu korrigieren.",
+    "set_floating": "Mikrofon-Knopf über anderen Fenstern",
+    "set_floating_hint": "Ein kleiner Knopf unten am Bildschirm startet das Diktat per Klick. Er verschwindet, solange ein Video oder Spiel im Vollbild läuft.",
+    "overlay_placeholder": "Sprechen Sie, der Text erscheint hier. Zum Bearbeiten klicken",
 }

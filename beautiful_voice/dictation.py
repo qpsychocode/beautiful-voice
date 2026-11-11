@@ -51,6 +51,19 @@ def join_phrases(parts: list[str]) -> str:
     return re.sub(r"\s+([,.!?;:])", r"\1", re.sub(r"\s{2,}", " ", text)).strip()
 
 
+def merge_edit(edited: str, base_words: int, recognized: str) -> str:
+    """The user's edited text plus whatever was recognized after they edited it.
+
+    ``base_words`` is how many recognized words the user had in front of them
+    when they last changed the text; later words are appended to their version.
+    """
+    tail = recognized.split()[base_words:]
+    if not tail:
+        return edited
+    sep = "" if not edited or edited[-1].isspace() else " "
+    return edited + sep + " ".join(tail)
+
+
 @dataclass
 class Session:
     id: int
@@ -69,6 +82,16 @@ class Session:
     pending_samples: int = 0
     partial: str = ""
     stopped: float = 0.0
+    # What the model has recognized so far, and the user's own edit of it.
+    recognized: str = ""
+    edited: str | None = None
+    edit_base: int = 0
+
+    def shown_text(self, recognized: str | None = None) -> str:
+        text = self.recognized if recognized is None else recognized
+        if self.edited is None:
+            return text
+        return merge_edit(self.edited, self.edit_base, text)
 
 
 STREAM_BATCH = 4000  # samples (0.25 s) handed to the streaming model at a time
@@ -79,7 +102,8 @@ class Dictation(QObject):
     level = Signal(float)
     notice = Signal(str)  # message key for the overlay: "no_model", "mic_error", "empty", ...
     completed = Signal(object)  # HistoryEntry
-    partialText = Signal(str)  # what's been recognized so far, while recording
+    partialText = Signal(str)  # what's been recognized so far (with the user's edits), while recording
+    _partial = Signal(object, str)
     _hotkey_press = Signal()
     _hotkey_release = Signal()
     _escape = Signal()
@@ -109,6 +133,7 @@ class Dictation(QObject):
         self._hotkey_release.connect(self._on_hotkey_release)
         self._escape.connect(self.cancel)
         self._finished.connect(self._on_finished)
+        self._partial.connect(self._on_partial)
         self._inserted.connect(self._on_inserted)
 
     # --- hotkey entry points (called from the hotkey thread) ---------------
@@ -224,7 +249,7 @@ class Dictation(QObject):
             return
         if text != session.partial and session is self.session:
             session.partial = text
-            self.partialText.emit(text)
+            self._partial.emit(session, text)
 
     def _finish_stream(self, session: Session) -> None:
         if session.cancelled:
@@ -254,6 +279,23 @@ class Dictation(QObject):
             return
         if not _is_hallucination(text):
             session.texts[segment.index] = text
+            self._partial.emit(session, join_phrases([session.texts[k] for k in sorted(session.texts)]))
+
+    @Slot(object, str)
+    def _on_partial(self, session: Session, text: str) -> None:
+        if session is not self.session or session.cancelled:
+            return
+        session.recognized = text
+        self.partialText.emit(session.shown_text())
+
+    @Slot(str)
+    def edit_text(self, text: str) -> None:
+        """The user changed the live text in the overlay: keep their version."""
+        session = self.session
+        if session is None or self.state != "recording":
+            return
+        session.edited = text
+        session.edit_base = len(session.recognized.split())
 
     def _finalize(self, session: Session) -> None:
         if session.cancelled:
@@ -324,6 +366,12 @@ class Dictation(QObject):
             self._set_state("message")
             self._settle_timer.start(3500)
             return
+        if session.edited is not None:
+            text = session.shown_text(text).strip()
+            log.info("dictation %s: the user edited the text", session.id)
+            if not text:  # they cleared it on purpose: nothing to insert, nothing to complain about
+                self._set_state("idle")
+                return
         if not text:
             self._show_notice("empty")
             return

@@ -95,11 +95,19 @@ Flickable {
             SettingRow {
                 label: page.t.set_mode
                 hint: page.s.hotkey_mode === "hold" ? page.t.set_mode_hold_hint : page.t.set_mode_toggle_hint
-                last: true
                 Segmented {
                     options: [{ value: "toggle", label: page.t.mode_toggle }, { value: "hold", label: page.t.mode_hold }]
                     current: page.s.hotkey_mode
                     onPicked: v => backend.setSetting("hotkey_mode", v)
+                }
+            }
+            SettingRow {
+                label: page.t.set_floating
+                hint: page.t.set_floating_hint
+                last: true
+                Toggle {
+                    checked: page.s.floating_button
+                    onToggled: v => backend.setSetting("floating_button", v)
                 }
             }
         }

@@ -174,5 +174,8 @@ STRINGS = {
     "set_autostart_mac": "ログイン時に開く",
     "blurb_nemotron-3.5-asr-streaming-full": "8 ビット圧縮なしの Nemotron 3.5。実際の音声入力で最も正確ですが、サイズが大きく少し遅めです。",
     "set_caption": "話している間にテキストを表示",
-    "set_caption_hint": "認識された言葉が話している間に録音バーの上に表示されます。Nemotron モデルで使えます。",
+    "set_caption_hint": "認識された言葉が話している間に録音バーの上に表示されます。入力前にテキストをクリックして修正できます。",
+    "set_floating": "他のウィンドウの上にマイクボタン",
+    "set_floating_hint": "画面下の小さなボタンをクリックすると音声入力が始まります。動画やゲームが全画面のときは隠れます。",
+    "overlay_placeholder": "話すとここに文字が表示されます。クリックして編集",
 }

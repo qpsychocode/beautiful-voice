@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from beautiful_voice.config import Settings, SettingsStore
-from beautiful_voice.dictation import _is_hallucination, join_phrases
+from beautiful_voice.dictation import Session, _is_hallucination, join_phrases, merge_edit
 from beautiful_voice.history import History, HistoryEntry
 from beautiful_voice.hotkeys import parse_combo
 from beautiful_voice.i18n import STRINGS
@@ -224,3 +224,18 @@ def test_chinese_words_are_counted_by_character():
     assert count_words("开放时间早上九点") == 8
     assert count_words("hello world") == 2
     assert count_words("打开 GitHub 页面") == 5
+
+
+def test_merge_edit_keeps_user_text_and_appends_new_words():
+    assert merge_edit("hello world", 2, "hello world again today") == "hello world again today"
+    assert merge_edit("hello ", 2, "hello world again") == "hello again"
+    assert merge_edit("", 2, "hello world") == ""
+    assert merge_edit("", 2, "hello world new") == "new"
+
+    session = Session(id=1, target_hwnd=0, target_is_self=False, language="en")
+    session.recognized = "one two"
+    assert session.shown_text() == "one two"
+    session.edited = "ONE"
+    session.edit_base = len(session.recognized.split())
+    session.recognized = "one two three"
+    assert session.shown_text() == "ONE three"

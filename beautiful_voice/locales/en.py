@@ -174,5 +174,8 @@ STRINGS = {
     "set_autostart_mac": "Open at login",
     "blurb_nemotron-3.5-asr-streaming-full": "The same Nemotron 3.5 without 8-bit compression: the most accurate on real dictation, a bigger download and somewhat slower.",
     "set_caption": "Show text while I speak",
-    "set_caption_hint": "The recognized words appear above the recording pill as you talk. Works with Nemotron models.",
+    "set_caption_hint": "The recognized words appear above the recording pill as you talk. Click the text to fix it before it's inserted.",
+    "set_floating": "Mic button on top of other windows",
+    "set_floating_hint": "A small button at the bottom of the screen starts dictation with a click. It hides while a video or game is full screen.",
+    "overlay_placeholder": "Speak, the text appears here. Click to edit it",
 }

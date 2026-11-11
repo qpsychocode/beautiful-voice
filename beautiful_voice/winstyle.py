@@ -34,14 +34,78 @@ def style_title_bar(window, dark: bool, caption: str, text: str) -> None:
         dwm.DwmSetWindowAttribute(hwnd, attr, ctypes.byref(val), ctypes.sizeof(val))
 
 
-def make_no_activate(window) -> None:
-    if sys.platform != "win32":
-        return
+def _user32():
     import ctypes
+    from ctypes import wintypes
 
     user32 = ctypes.windll.user32
     user32.GetWindowLongPtrW.restype = ctypes.c_ssize_t
+    user32.GetWindowLongPtrW.argtypes = [ctypes.c_void_p, ctypes.c_int]
+    user32.SetWindowLongPtrW.restype = ctypes.c_ssize_t
     user32.SetWindowLongPtrW.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_ssize_t]
+    user32.GetForegroundWindow.restype = wintypes.HWND
+    user32.SetForegroundWindow.argtypes = [wintypes.HWND]
+    user32.GetWindowRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
+    user32.MonitorFromWindow.argtypes = [wintypes.HWND, wintypes.DWORD]
+    user32.MonitorFromWindow.restype = wintypes.HANDLE
+    user32.GetMonitorInfoW.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+    user32.GetShellWindow.restype = wintypes.HWND
+    user32.GetDesktopWindow.restype = wintypes.HWND
+    user32.GetClassNameW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
+    user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+    return user32
+
+
+def activate(window) -> None:
+    """Let the overlay take the keyboard for a moment, so its text can be edited."""
+    if sys.platform != "win32":
+        return
+    user32 = _user32()
     hwnd = int(window.winId())
-    style = user32.GetWindowLongPtrW(ctypes.c_void_p(hwnd), GWL_EXSTYLE)
+    style = user32.GetWindowLongPtrW(hwnd, GWL_EXSTYLE)
+    user32.SetWindowLongPtrW(hwnd, GWL_EXSTYLE, style & ~WS_EX_NOACTIVATE)
+    user32.SetForegroundWindow(hwnd)
+
+
+def foreground_is_fullscreen() -> bool:
+    """A video, game or presentation covers the whole screen of the active window."""
+    if sys.platform != "win32":
+        return False
+    import ctypes
+    import os
+    from ctypes import wintypes
+
+    class MONITORINFO(ctypes.Structure):
+        _fields_ = [("cbSize", wintypes.DWORD), ("rcMonitor", wintypes.RECT),
+                    ("rcWork", wintypes.RECT), ("dwFlags", wintypes.DWORD)]
+
+    user32 = _user32()
+    hwnd = user32.GetForegroundWindow()
+    if not hwnd or hwnd in (user32.GetShellWindow(), user32.GetDesktopWindow()):
+        return False
+    pid = wintypes.DWORD()
+    user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    if pid.value == os.getpid():
+        return False
+    cls = ctypes.create_unicode_buffer(64)
+    user32.GetClassNameW(hwnd, cls, 64)
+    if cls.value in ("Progman", "WorkerW", "Shell_TrayWnd"):
+        return False
+    rect = wintypes.RECT()
+    if not user32.GetWindowRect(hwnd, ctypes.byref(rect)):
+        return False
+    info = MONITORINFO()
+    info.cbSize = ctypes.sizeof(MONITORINFO)
+    if not user32.GetMonitorInfoW(user32.MonitorFromWindow(hwnd, 2), ctypes.byref(info)):
+        return False
+    m = info.rcMonitor
+    return rect.left <= m.left and rect.top <= m.top and rect.right >= m.right and rect.bottom >= m.bottom
+
+
+def make_no_activate(window) -> None:
+    if sys.platform != "win32":
+        return
+    user32 = _user32()
+    hwnd = int(window.winId())
+    style = user32.GetWindowLongPtrW(hwnd, GWL_EXSTYLE)
     user32.SetWindowLongPtrW(hwnd, GWL_EXSTYLE, style | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_TOPMOST)

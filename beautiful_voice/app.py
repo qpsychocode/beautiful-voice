@@ -162,6 +162,7 @@ def main(argv: list[str] | None = None) -> int:
     # The overlay must never take focus from the app you're typing in.
     overlay.create()
     winstyle.make_no_activate(overlay)
+    overlay.setProperty("armed", not args.shots)  # now the floating button may appear
 
     active = by_id(store.get("active_model"))
     installed = [s.id for s in CATALOG if models.installed(s)]
